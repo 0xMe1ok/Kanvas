@@ -21,7 +21,7 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-        // TODO: change OwnerId, MemberId and other to user FK
+        // TODO: change OwnerId, MemberId and other userId's to user FK
         
         modelBuilder.Entity<TeamMember>().ToTable("TeamMembers");
         modelBuilder.Entity<TeamMember>().HasKey(p => new {p.MemberId, p.TeamId}); // user here
