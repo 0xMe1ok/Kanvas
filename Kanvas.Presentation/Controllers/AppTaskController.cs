@@ -1,16 +1,14 @@
 using AutoMapper;
 using Presentation;
 using Presentation.DTOs;
-using Presentation.Mapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Entities;
-using Presentation.Mapper;
 
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/task")]
+[Route("api/tasks")]
 public class AppTaskController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -23,10 +21,10 @@ public class AppTaskController : ControllerBase
     }
     
     [HttpGet]
-    [Route("{taskId}")]
-    public async Task<IActionResult> GetById(Guid taskId)
+    [Route("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == taskId);
+        var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return NotFound();
         return Ok(_mapper.Map<AppTaskDto>(task));
     }
@@ -35,7 +33,6 @@ public class AppTaskController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var tasks = await _context.AppTasks.ToListAsync();
-        
         return Ok(tasks.Select(task => _mapper.Map<AppTaskDto>(task)));
     }
 
@@ -45,11 +42,10 @@ public class AppTaskController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var task = _mapper.Map<AppTask>(appTaskDto);
-
         await _context.AppTasks.AddAsync(task);
         await _context.SaveChangesAsync();
         
-        return Ok();
+        return CreatedAtAction(nameof(GetById), new { id = task.Id }, _mapper.Map<AppTaskDto>(task));
     }
 
     [HttpPut]
@@ -60,10 +56,9 @@ public class AppTaskController : ControllerBase
         
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == taskId);
         if (task == null) return NotFound();
-        
         _mapper.Map(appTaskDto, task);
-        
         await _context.SaveChangesAsync();
+        
         return Ok(appTaskDto);
     }
 
@@ -75,6 +70,7 @@ public class AppTaskController : ControllerBase
         if (task == null) return NotFound();
         _context.AppTasks.Remove(task);
         await _context.SaveChangesAsync();
+        
         return NoContent();
     }
 }
