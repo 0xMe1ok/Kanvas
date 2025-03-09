@@ -1,7 +1,7 @@
-using Domain.Entities;
+using Presentation.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure;
+namespace Presentation;
 
 public class ApplicationDbContext : DbContext
 {

@@ -1,7 +1,7 @@
-using Domain.Entities;
-using Infrastructure.DTOs;
+using Presentation.Entities;
+using Presentation.DTOs;
 
-namespace Infrastructure.Mapper;
+namespace Presentation.Mapper;
 
 public static class AppTaskMapper
 {

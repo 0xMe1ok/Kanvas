@@ -1,4 +1,4 @@
-namespace Domain.Entities;
+namespace Presentation.Entities;
 
 public class AppTask : EntityBase<Guid>
 {

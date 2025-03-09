@@ -1,4 +1,4 @@
-namespace Domain.Entities;
+namespace Presentation.Entities;
 
 public abstract class EntityBase<T>
 {

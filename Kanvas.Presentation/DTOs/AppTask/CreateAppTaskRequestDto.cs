@@ -1,4 +1,4 @@
-namespace Infrastructure.DTOs;
+namespace Presentation.DTOs;
 
 public class CreateAppTaskRequestDto
 {

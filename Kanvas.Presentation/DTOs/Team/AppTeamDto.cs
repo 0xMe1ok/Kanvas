@@ -1,4 +1,4 @@
-namespace Infrastructure.DTOs.Team;
+namespace Presentation.DTOs.Team;
 
 public class AppTeamDto
 {

@@ -1,8 +1,9 @@
 using Infrastructure;
-using Infrastructure.DTOs;
+using Presentation.DTOs;
 using Infrastructure.Mapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Mapper;
 
 namespace Presentation.Controllers;
 
