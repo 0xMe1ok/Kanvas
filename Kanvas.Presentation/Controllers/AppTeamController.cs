@@ -11,7 +11,7 @@ using Presentation.Entities;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/team")]
+[Route("api/teams")]
 public class AppTeamController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -24,10 +24,10 @@ public class AppTeamController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{teamId}")]
-    public async Task<IActionResult> GetById([FromRoute] Guid teamId)
+    [Route("{id}")]
+    public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
+        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == id);
         if (team == null) return NotFound();
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
@@ -47,6 +47,7 @@ public class AppTeamController : ControllerBase
         var team = _mapper.Map<AppTeam>(appTeamDto);
         _context.AppTeams.Add(team);
         await _context.SaveChangesAsync();
+        
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
 
@@ -58,10 +59,9 @@ public class AppTeamController : ControllerBase
         
         var team = _context.AppTeams.FirstOrDefault(t => t.Id == teamId);
         if (team == null) return NotFound();
-        
         _mapper.Map(appTeamDto, team);
-        
         await _context.SaveChangesAsync();
+        
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
 
@@ -73,6 +73,7 @@ public class AppTeamController : ControllerBase
         if (team == null) return NotFound();
         _context.AppTeams.Remove(team);
         await _context.SaveChangesAsync();
+        
         return NoContent();
     }
 
@@ -100,10 +101,13 @@ public class AppTeamController : ControllerBase
     {
         var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
         if (team == null) return NotFound();
+        
         var membership = await _context.TeamMembers.FirstOrDefaultAsync(t => t.MemberId == userId);
         if (membership == null) return NotFound();
+        
         _context.TeamMembers.Remove(membership);
         await _context.SaveChangesAsync();
+        
         return Ok();
     }
     
