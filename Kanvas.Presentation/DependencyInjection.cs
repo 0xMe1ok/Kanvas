@@ -1,4 +1,5 @@
 using Infrastructure;
+using Infrastructure.Mapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace Presentation;
@@ -11,6 +12,8 @@ public static class DependencyInjection
                 options.UseNpgsql("Server=127.0.0.1;Port=5432;Database=kanvasdb;Username=pguser;Password=secretpassword;");
             }
         );
+
+        services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
         
         return services;
     }

@@ -1,8 +1,10 @@
+using AutoMapper;
 using Infrastructure;
 using Presentation.DTOs;
 using Infrastructure.Mapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Entities;
 using Presentation.Mapper;
 
 namespace Presentation.Controllers;
@@ -12,10 +14,12 @@ namespace Presentation.Controllers;
 public class AppTaskController : ControllerBase
 {
     public ApplicationDbContext _context;
+    private readonly IMapper _mapper;
 
-    public AppTaskController(ApplicationDbContext context)
+    public AppTaskController(ApplicationDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
     
     [HttpGet]
@@ -24,7 +28,7 @@ public class AppTaskController : ControllerBase
     {
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == taskId);
         if (task == null) return NotFound();
-        return Ok(task.ToAppTaskDto());
+        return Ok(_mapper.Map<AppTaskDto>(task));
     }
 
     [HttpGet]
@@ -32,13 +36,13 @@ public class AppTaskController : ControllerBase
     {
         var tasks = await _context.AppTasks.ToListAsync();
         
-        return Ok(tasks.Select(t => t.ToAppTaskDto()));
+        return Ok(tasks.Select(task => _mapper.Map<AppTaskDto>(task)));
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateAppTaskRequestDto appTaskDto)
     {
-        var task = appTaskDto.ToAppTask();
+        var task = _mapper.Map<AppTask>(appTaskDto);
 
         await _context.AppTasks.AddAsync(task);
         await _context.SaveChangesAsync();
@@ -53,12 +57,7 @@ public class AppTaskController : ControllerBase
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == taskId);
         if (task == null) return NotFound();
         
-        task.Name = appTaskDto.Name;
-        task.Description = appTaskDto.Description;
-        task.DueDate = appTaskDto.DueDate;
-        task.ColumnId = appTaskDto.ColumnId;
-        task.AssigneeId = appTaskDto.AssigneeId;
-        task.Order = appTaskDto.Order;
+        _mapper.Map(appTaskDto, task);
         
         await _context.SaveChangesAsync();
         return Ok(appTaskDto);

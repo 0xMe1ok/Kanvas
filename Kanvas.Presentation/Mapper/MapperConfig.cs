@@ -8,6 +8,9 @@ public class AutomapperConfig : Profile
 {
     public AutomapperConfig()
     {
-        CreateMap<AppTask, AppTaskDto>();
+        CreateMap<AppTask, AppTaskDto>().ReverseMap();
+        CreateMap<CreateAppTaskRequestDto, AppTask>();
+        CreateMap<UpdateAppTaskRequestDto, AppTask>();
+        
     }
 }
