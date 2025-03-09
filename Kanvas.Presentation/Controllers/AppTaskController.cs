@@ -13,7 +13,7 @@ namespace Presentation.Controllers;
 [Route("api/task")]
 public class AppTaskController : ControllerBase
 {
-    public ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
     public AppTaskController(ApplicationDbContext context, IMapper mapper)
@@ -42,6 +42,8 @@ public class AppTaskController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateAppTaskRequestDto appTaskDto)
     {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
         var task = _mapper.Map<AppTask>(appTaskDto);
 
         await _context.AppTasks.AddAsync(task);
@@ -54,6 +56,8 @@ public class AppTaskController : ControllerBase
     [Route("{taskId}")]
     public async Task<IActionResult> Update([FromRoute] Guid taskId, [FromBody] UpdateAppTaskRequestDto appTaskDto)
     {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == taskId);
         if (task == null) return NotFound();
         
