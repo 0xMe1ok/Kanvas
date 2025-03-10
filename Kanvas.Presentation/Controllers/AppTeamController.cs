@@ -24,7 +24,7 @@ public class AppTeamController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{id}")]
+    [Route("{id:guid}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == id);
@@ -40,7 +40,7 @@ public class AppTeamController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateAppTaskRequestDto appTeamDto)
+    public async Task<IActionResult> Create([FromBody] CreateTeamRequestDto appTeamDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
@@ -52,12 +52,12 @@ public class AppTeamController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{teamId}")]
-    public async Task<IActionResult> Put([FromRoute] Guid teamId, [FromBody] UpdateAppTaskRequestDto appTeamDto)
+    [Route("{id:guid}")]
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTeamRequestDto appTeamDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var team = _context.AppTeams.FirstOrDefault(t => t.Id == teamId);
+        var team = _context.AppTeams.FirstOrDefault(t => t.Id == id);
         if (team == null) return NotFound();
         _mapper.Map(appTeamDto, team);
         await _context.SaveChangesAsync();
@@ -66,10 +66,10 @@ public class AppTeamController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("{teamId}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid teamId)
+    [Route("{id:guid}")]
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
+        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == id);
         if (team == null) return NotFound();
         _context.AppTeams.Remove(team);
         await _context.SaveChangesAsync();

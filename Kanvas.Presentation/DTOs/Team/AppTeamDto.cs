@@ -4,9 +4,8 @@ namespace Presentation.DTOs.Team;
 
 public class AppTeamDto
 {
-    public string Name { get; private set; }
-    
-    public string OwnerId { get; private set; }
-    
-    public List<Entities.TaskBoard>? Boards { get; private set; }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string OwnerId { get; set; }
+    public List<Entities.TaskBoard>? Boards { get; set; }
 }
