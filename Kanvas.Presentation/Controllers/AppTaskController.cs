@@ -21,7 +21,7 @@ public class AppTaskController : ControllerBase
     }
     
     [HttpGet]
-    [Route("{id}")]
+    [Route("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == id);
@@ -37,9 +37,14 @@ public class AppTaskController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateAppTaskRequestDto appTaskDto)
+    public async Task<IActionResult> Create([FromBody] CreateAppTaskRequestDto appTaskDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
+        
+        if (appTaskDto.BoardId != null && !_context.TaskBoards.Any(b => b.Id == appTaskDto.BoardId))
+        {
+            return NotFound("Board doesn't exist");
+        }
         
         var task = _mapper.Map<AppTask>(appTaskDto);
         await _context.AppTasks.AddAsync(task);
@@ -49,12 +54,17 @@ public class AppTaskController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{taskId}")]
-    public async Task<IActionResult> Update([FromRoute] Guid taskId, [FromBody] UpdateAppTaskRequestDto appTaskDto)
+    [Route("{id:guid}")]
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTaskRequestDto appTaskDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == taskId);
+        if (appTaskDto.BoardId != null && !_context.TaskBoards.Any(b => b.Id == appTaskDto.BoardId))
+        {
+            return NotFound("Board doesn't exist");
+        }
+        
+        var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return NotFound();
         _mapper.Map(appTaskDto, task);
         await _context.SaveChangesAsync();
@@ -63,10 +73,10 @@ public class AppTaskController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("{taskId}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid taskId)
+    [Route("{id:guid}")]
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == taskId);
+        var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return NotFound();
         _context.AppTasks.Remove(task);
         await _context.SaveChangesAsync();
