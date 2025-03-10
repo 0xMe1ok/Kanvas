@@ -24,8 +24,19 @@ public class TaskBoardController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var board = await _context.TaskBoards
-            .Include(board => board.Columns)
-            .ThenInclude(columns => columns.Tasks)
+            .Select(board => new
+            {
+                Id = board.Id,
+                Columns = board.Columns
+                    .OrderBy(column => column.Order)
+                    .Select(column => new
+                    {
+                        Column = column,
+                        Tasks = _context.AppTasks
+                            .Where(task => task.BoardId == board.Id && task.Status == column.Status)
+                            .ToList()
+                    })
+            })
             .FirstOrDefaultAsync(b => b.Id == id);
         if (board == null) return NotFound();
         
@@ -73,6 +84,12 @@ public class TaskBoardController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var board = _context.TaskBoards.FirstOrDefault(b => b.Id == id);
         if (board == null) return NotFound();
+        
+        var tasks = _context.AppTasks.Where(task => task.BoardId == id);
+        
+        foreach (var task in tasks)
+            task.BoardId = null;
+        
         _context.TaskBoards.Remove(board);
         await _context.SaveChangesAsync();
         
