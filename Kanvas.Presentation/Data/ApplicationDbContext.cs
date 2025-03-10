@@ -1,5 +1,6 @@
 using Presentation.Entities;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Configuration;
 
 namespace Presentation;
 
@@ -15,55 +16,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<TaskBoard> TaskBoards { get; set; }
     public DbSet<BoardColumn> BoardColumns { get; set; }
     public DbSet<AppTask> AppTasks { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         // TODO: change OwnerId, MemberId and other userId's to user FK
-        
-        modelBuilder.Entity<TeamMember>().ToTable("TeamMembers");
-        modelBuilder.Entity<TeamMember>().HasKey(p => new {p.MemberId, p.TeamId}); // user here
-        modelBuilder.Entity<TeamMember>().Property(p => p.MemberId).ValueGeneratedOnAdd();
-
-        modelBuilder.Entity<AppTeam>().ToTable("Teams");
-        modelBuilder.Entity<AppTeam>().HasKey(team => team.Id);
-        modelBuilder.Entity<AppTeam>().Property(team => team.Id).ValueGeneratedOnAdd();
-        modelBuilder.Entity<AppTeam>().Property(team => team.OwnerId).HasDefaultValue(Guid.NewGuid()); // user here
-        modelBuilder.Entity<AppTeam>()
-            .HasMany(team => team.Boards)
-            .WithOne(board => board.Team)
-            .HasForeignKey(t => t.TeamId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        modelBuilder.Entity<TaskBoard>().ToTable("Boards");
-        modelBuilder.Entity<TaskBoard>().HasKey(t => t.Id);
-        modelBuilder.Entity<TaskBoard>().Property(t => t.Id).ValueGeneratedOnAdd();
-        modelBuilder.Entity<TaskBoard>()
-            .HasMany(board => board.Columns)
-            .WithOne(column => column.Board)
-            .HasForeignKey(board => board.BoardId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        modelBuilder.Entity<BoardColumn>().ToTable("Columns");
-        modelBuilder.Entity<BoardColumn>().HasKey(column => column.Id);
-        modelBuilder.Entity<BoardColumn>().Property(column => column.Id).ValueGeneratedOnAdd();
-        modelBuilder.Entity<BoardColumn>()
-            .Property(c => c.Status)
-            .HasConversion<string>();
-        
-        modelBuilder.Entity<AppTask>().ToTable("Tasks");
-        modelBuilder.Entity<AppTask>().HasKey(t => t.Id);
-        modelBuilder.Entity<AppTask>().Property(t => t.Id).ValueGeneratedOnAdd();
-        modelBuilder.Entity<AppTask>().Property(t => t.CreatedBy).HasDefaultValue(Guid.NewGuid()); // user here
-        modelBuilder.Entity<AppTask>()
-            .HasOne(t => t.Board)
-            .WithMany(b => b.Tasks)
-            .HasForeignKey(t => t.BoardId);
-        modelBuilder.Entity<AppTask>()
-            .Property(t => t.Status)
-            .HasConversion<string>();
-        
-        
     }
 }
