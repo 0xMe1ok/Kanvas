@@ -1,8 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Presentation.DTOs.BoardColumn;
 using Presentation.DTOs.TaskBoard;
 using Presentation.Entities;
+using Presentation.Enums;
 
 namespace Presentation.Controllers;
 
@@ -23,6 +25,7 @@ public class TaskBoardController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
+        // TODO: simplify query
         var board = await _context.TaskBoards
             .Select(board => new
             {
@@ -38,9 +41,10 @@ public class TaskBoardController : ControllerBase
                     })
             })
             .FirstOrDefaultAsync(b => b.Id == id);
+        
         if (board == null) return NotFound();
         
-        return Ok(_mapper.Map<TaskBoardDto>(board));
+        return Ok(board);
     }
 
     [HttpGet]
@@ -63,6 +67,40 @@ public class TaskBoardController : ControllerBase
         
         var board = _mapper.Map<TaskBoard>(taskBoardDto);
         await _context.TaskBoards.AddAsync(board);
+
+        var columnsStarterPack = new List<BoardColumn>
+        {
+            new BoardColumn
+            {
+                Id = Guid.NewGuid(),
+                BoardId = board.Id,
+                Name = "ToDo",
+                Order = 0,
+                Status = Status.ToDo,
+                TaskLimit = null
+            },
+            new BoardColumn
+            {
+                Id = Guid.NewGuid(),
+                BoardId = board.Id,
+                Name = "InProgress",
+                Order = 1,
+                Status = Status.InProgress,
+                TaskLimit = null
+            },
+            new BoardColumn
+            {
+                Id = Guid.NewGuid(),
+                BoardId = board.Id,
+                Name = "Done",
+                Order = 2,
+                Status = Status.Done,
+                TaskLimit = null
+            },
+        };
+        
+        await _context.BoardColumns.AddRangeAsync(columnsStarterPack);
+        
         await _context.SaveChangesAsync();
         
         return CreatedAtAction(nameof(GetById), new {id = board.Id}, _mapper.Map<TaskBoardDto>(board));
