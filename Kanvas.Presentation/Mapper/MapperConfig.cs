@@ -5,7 +5,7 @@ using Presentation.DTOs.TaskBoard;
 using Presentation.DTOs.Team;
 using Presentation.Entities;
 
-namespace Infrastructure.Mapper;
+namespace Presentation.Mapper;
 
 public class AutomapperConfig : Profile
 {
@@ -17,7 +17,7 @@ public class AutomapperConfig : Profile
         
         CreateMap<AppTeam, AppTeamDto>().ReverseMap();
         CreateMap<CreateTeamRequestDto, AppTeam>();
-        CreateMap<UpdateTeamRequesrDto, AppTeam>();
+        CreateMap<UpdateTeamRequestDto, AppTeam>();
         
         CreateMap<BoardColumn, BoardColumnDto>().ReverseMap();
         CreateMap<CreateBoardColumnRequestDto, BoardColumn>();

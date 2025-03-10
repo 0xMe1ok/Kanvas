@@ -1,7 +1,7 @@
 using AutoMapper;
-using Infrastructure;
+using Presentation;
 using Presentation.DTOs;
-using Infrastructure.Mapper;
+using Presentation.Mapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
