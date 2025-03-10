@@ -36,7 +36,7 @@ public class BoardColumnController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> Post([FromBody] CreateBoardColumnRequestDto boardColumnDto)
+    public async Task<ActionResult> Create([FromBody] CreateBoardColumnRequestDto boardColumnDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
@@ -49,7 +49,7 @@ public class BoardColumnController : Controller
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<ActionResult> Put([FromRoute] Guid id, [FromBody] UpdateBoardColumnRequestDto boardColumnDto)
+    public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBoardColumnRequestDto boardColumnDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
