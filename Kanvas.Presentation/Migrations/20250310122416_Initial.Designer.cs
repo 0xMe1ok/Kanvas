@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Presentation;
 
 #nullable disable
 
 namespace Presentation.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250308144028_Initial")]
+    [Migration("20250310122416_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,7 +25,7 @@ namespace Presentation.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.AppTask", b =>
+            modelBuilder.Entity("Presentation.Entities.AppTask", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,7 +34,7 @@ namespace Presentation.Migrations
                     b.Property<Guid?>("AssigneeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ColumnId")
+                    b.Property<Guid?>("BoardId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -42,7 +43,7 @@ namespace Presentation.Migrations
                     b.Property<Guid>("CreatedBy")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValue(new Guid("a5cb10a3-53dd-44cb-bdc5-b33e2b730aac"));
+                        .HasDefaultValue(new Guid("adc616d9-f157-4cc6-9950-ca9bff320fc2"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -58,14 +59,18 @@ namespace Presentation.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ColumnId");
+                    b.HasIndex("BoardId");
 
                     b.ToTable("Tasks", (string)null);
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.AppTeam", b =>
+            modelBuilder.Entity("Presentation.Entities.AppTeam", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,14 +83,14 @@ namespace Presentation.Migrations
                     b.Property<Guid>("OwnerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValue(new Guid("f5725c59-6b73-4dae-830d-28d5f5fd533f"));
+                        .HasDefaultValue(new Guid("87d00acf-8e90-4800-ba8f-47ac57e4c631"));
 
                     b.HasKey("Id");
 
                     b.ToTable("Teams", (string)null);
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.BoardColumn", b =>
+            modelBuilder.Entity("Presentation.Entities.BoardColumn", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -101,6 +106,10 @@ namespace Presentation.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int?>("TaskLimit")
                         .HasColumnType("integer");
 
@@ -111,7 +120,7 @@ namespace Presentation.Migrations
                     b.ToTable("Columns", (string)null);
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.TaskBoard", b =>
+            modelBuilder.Entity("Presentation.Entities.TaskBoard", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -131,7 +140,7 @@ namespace Presentation.Migrations
                     b.ToTable("Boards", (string)null);
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.TeamMember", b =>
+            modelBuilder.Entity("Presentation.Entities.TeamMember", b =>
                 {
                     b.Property<Guid>("MemberId")
                         .ValueGeneratedOnAdd()
@@ -145,19 +154,18 @@ namespace Presentation.Migrations
                     b.ToTable("TeamMembers", (string)null);
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.AppTask", b =>
+            modelBuilder.Entity("Presentation.Entities.AppTask", b =>
                 {
-                    b.HasOne("Kanvas.Domain.Entities.BoardColumn", "Column")
+                    b.HasOne("Presentation.Entities.TaskBoard", "Board")
                         .WithMany("Tasks")
-                        .HasForeignKey("ColumnId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("BoardId");
 
-                    b.Navigation("Column");
+                    b.Navigation("Board");
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.BoardColumn", b =>
+            modelBuilder.Entity("Presentation.Entities.BoardColumn", b =>
                 {
-                    b.HasOne("Kanvas.Domain.Entities.TaskBoard", "Board")
+                    b.HasOne("Presentation.Entities.TaskBoard", "Board")
                         .WithMany("Columns")
                         .HasForeignKey("BoardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -166,9 +174,9 @@ namespace Presentation.Migrations
                     b.Navigation("Board");
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.TaskBoard", b =>
+            modelBuilder.Entity("Presentation.Entities.TaskBoard", b =>
                 {
-                    b.HasOne("Kanvas.Domain.Entities.AppTeam", "Team")
+                    b.HasOne("Presentation.Entities.AppTeam", "Team")
                         .WithMany("Boards")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -177,19 +185,16 @@ namespace Presentation.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.AppTeam", b =>
+            modelBuilder.Entity("Presentation.Entities.AppTeam", b =>
                 {
                     b.Navigation("Boards");
                 });
 
-            modelBuilder.Entity("Kanvas.Domain.Entities.BoardColumn", b =>
-                {
-                    b.Navigation("Tasks");
-                });
-
-            modelBuilder.Entity("Kanvas.Domain.Entities.TaskBoard", b =>
+            modelBuilder.Entity("Presentation.Entities.TaskBoard", b =>
                 {
                     b.Navigation("Columns");
+
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

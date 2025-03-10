@@ -12,7 +12,6 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<TeamMember> TeamMembers { get; set; }
     public DbSet<AppTeam> AppTeams { get; set; }
-    
     public DbSet<TaskBoard> TaskBoards { get; set; }
     public DbSet<BoardColumn> BoardColumns { get; set; }
     public DbSet<AppTask> AppTasks { get; set; }
@@ -50,14 +49,21 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<BoardColumn>().HasKey(column => column.Id);
         modelBuilder.Entity<BoardColumn>().Property(column => column.Id).ValueGeneratedOnAdd();
         modelBuilder.Entity<BoardColumn>()
-            .HasMany(column => column.Tasks)
-            .WithOne(task => task.Column)
-            .HasForeignKey(task => task.ColumnId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .Property(c => c.Status)
+            .HasConversion<string>();
         
         modelBuilder.Entity<AppTask>().ToTable("Tasks");
         modelBuilder.Entity<AppTask>().HasKey(t => t.Id);
         modelBuilder.Entity<AppTask>().Property(t => t.Id).ValueGeneratedOnAdd();
         modelBuilder.Entity<AppTask>().Property(t => t.CreatedBy).HasDefaultValue(Guid.NewGuid()); // user here
+        modelBuilder.Entity<AppTask>()
+            .HasOne(t => t.Board)
+            .WithMany(b => b.Tasks)
+            .HasForeignKey(t => t.BoardId);
+        modelBuilder.Entity<AppTask>()
+            .Property(t => t.Status)
+            .HasConversion<string>();
+        
+        
     }
 }

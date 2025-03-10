@@ -29,7 +29,7 @@ namespace Presentation.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("f5725c59-6b73-4dae-830d-28d5f5fd533f"))
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("87d00acf-8e90-4800-ba8f-47ac57e4c631"))
                 },
                 constraints: table =>
                 {
@@ -63,6 +63,7 @@ namespace Presentation.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Order = table.Column<int>(type: "integer", nullable: false),
                     TaskLimit = table.Column<int>(type: "integer", nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     BoardId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -86,19 +87,19 @@ namespace Presentation.Migrations
                     Order = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ColumnId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("a5cb10a3-53dd-44cb-bdc5-b33e2b730aac")),
+                    BoardId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("adc616d9-f157-4cc6-9950-ca9bff320fc2")),
                     AssigneeId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_Columns_ColumnId",
-                        column: x => x.ColumnId,
-                        principalTable: "Columns",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Tasks_Boards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "Boards",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -112,22 +113,22 @@ namespace Presentation.Migrations
                 column: "BoardId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_ColumnId",
+                name: "IX_Tasks_BoardId",
                 table: "Tasks",
-                column: "ColumnId");
+                column: "BoardId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Columns");
+
+            migrationBuilder.DropTable(
                 name: "Tasks");
 
             migrationBuilder.DropTable(
                 name: "TeamMembers");
-
-            migrationBuilder.DropTable(
-                name: "Columns");
 
             migrationBuilder.DropTable(
                 name: "Boards");
