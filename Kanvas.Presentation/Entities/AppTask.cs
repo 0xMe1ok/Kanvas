@@ -1,3 +1,5 @@
+using Presentation.Enums;
+
 namespace Presentation.Entities;
 
 public class AppTask : EntityBase<Guid>
@@ -8,7 +10,9 @@ public class AppTask : EntityBase<Guid>
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? DueDate { get; set; }
-    public Guid? ColumnId { get; set; }
+    
+    public Guid? BoardId { get; set; }
+    public Status Status { get; set; }
     public Guid CreatedBy { get; set; }
     public Guid? AssigneeId { get; set; }
     public BoardColumn? Column { get; set; }
@@ -36,10 +40,5 @@ public class AppTask : EntityBase<Guid>
     public void SetOrder(int order)
     {
         Order = order;
-    }
-
-    public void SetColumnId(Guid? columnId)
-    {
-        ColumnId = columnId;
     }
 }

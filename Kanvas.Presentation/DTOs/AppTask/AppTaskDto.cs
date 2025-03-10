@@ -1,3 +1,5 @@
+using Presentation.Enums;
+
 namespace Presentation.DTOs;
 
 public class AppTaskDto
@@ -8,7 +10,8 @@ public class AppTaskDto
     
     public DateTime CreatedAt { get; set; }
     public DateTime? DueDate { get; set; }
-    public Guid? ColumnId { get; set; }
+    public Guid? BoardId { get; set; }
+    public Status Status { get; set; }
     public Guid CreatedBy { get; set; }
     public Guid? AssigneeId { get; set; }
 }
