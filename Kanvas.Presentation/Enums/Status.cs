@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace Presentation.Enums;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Status
 {
     ToDo = 0,
