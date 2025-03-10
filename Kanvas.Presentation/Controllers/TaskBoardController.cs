@@ -52,9 +52,14 @@ public class TaskBoardController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromRoute] TaskBoardDto taskBoardDto)
+    public async Task<IActionResult> Create([FromBody] CreateTaskBoardRequestDto taskBoardDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        if (taskBoardDto.TeamId != null && !_context.AppTeams.Any(team => team.Id == taskBoardDto.TeamId))
+        {
+            return NotFound("Team doesn't exist");
+        }
         
         var board = _mapper.Map<TaskBoard>(taskBoardDto);
         await _context.TaskBoards.AddAsync(board);
@@ -65,7 +70,7 @@ public class TaskBoardController : ControllerBase
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] TaskBoardDto taskBoardDto)
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTaskBoardRequestDto taskBoardDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 

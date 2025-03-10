@@ -2,5 +2,5 @@ namespace Presentation.DTOs.TaskBoard;
 
 public class UpdateTaskBoardRequestDto
 {
-    public string Name { get; private set; }
+    public string Name { get; set; }
 }

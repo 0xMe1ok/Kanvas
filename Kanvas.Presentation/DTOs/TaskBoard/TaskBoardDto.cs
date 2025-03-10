@@ -4,7 +4,8 @@ namespace Presentation.DTOs.TaskBoard;
 
 public class TaskBoardDto
 {
-    public string Name { get; private set; }
-    public Guid TeamId { get; private set; }
-    public List<Entities.BoardColumn> Columns { get; private set; }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public Guid TeamId { get; set; }
+    public List<Entities.BoardColumn> Columns { get; set; }
 }
