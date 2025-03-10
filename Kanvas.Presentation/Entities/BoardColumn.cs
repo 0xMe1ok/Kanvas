@@ -4,11 +4,11 @@ namespace Presentation.Entities;
 
 public class BoardColumn : EntityBase<Guid>
 {
-    public string Name { get; private set; } 
-    public int Order { get; private set; }
-    public int? TaskLimit { get; private set; }
+    public string Name { get; set; } 
+    public int Order { get; set; }
+    public int? TaskLimit { get; set; }
     public Status Status { get; set; }
     
-    public Guid BoardId { get; private set; }
-    public TaskBoard Board { get; private set; }
+    public Guid BoardId { get; set; }
+    public TaskBoard Board { get; set; }
 }
