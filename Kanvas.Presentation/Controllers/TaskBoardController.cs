@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Presentation.DTOs;
 using Presentation.DTOs.BoardColumn;
 using Presentation.DTOs.TaskBoard;
 using Presentation.Entities;

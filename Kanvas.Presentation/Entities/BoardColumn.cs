@@ -11,4 +11,6 @@ public class BoardColumn : EntityBase<Guid>
     
     public Guid BoardId { get; set; }
     public TaskBoard Board { get; set; }
+    
+    public List<AppTask> Tasks { get; set; }
 }

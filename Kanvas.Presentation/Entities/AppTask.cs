@@ -16,11 +16,13 @@ public class AppTask : EntityBase<Guid>
     public DateTime? DueDate { get; set; }
     
     public Guid? BoardId { get; set; }
+    public Guid? ColumnId { get; set; }
     public Status Status { get; set; }
     public Guid CreatedBy { get; set; }
     public Guid? AssigneeId { get; set; }
     
     public TaskBoard? Board { get; set; }
+    public BoardColumn? Column { get; set; }
 
     public void SetAssignedTo(Guid? assignedTo)
     {
