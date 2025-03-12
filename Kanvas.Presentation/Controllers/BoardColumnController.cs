@@ -23,6 +23,7 @@ public class BoardColumnController : Controller
     [Route("{id:guid}")]
     public async Task<ActionResult> GetById([FromRoute] Guid id)
     {
+        // TODO: only for boards in accessible teams
         var column = await _context.BoardColumns.FirstOrDefaultAsync(c => c.Id == id);
         if (column == null) return NotFound();
         return Ok(_mapper.Map<BoardColumnDto>(column));
@@ -31,6 +32,7 @@ public class BoardColumnController : Controller
     [HttpGet]
     public async Task<ActionResult> GetAll()
     {
+        // TODO: only for boards in accessible teams
         var columns = _context.BoardColumns.ToList();
         return Ok(_mapper.Map<List<BoardColumnDto>>(columns));
     }
@@ -38,6 +40,7 @@ public class BoardColumnController : Controller
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] CreateBoardColumnRequestDto boardColumnDto)
     {
+        // TODO: only for boards in accessible teams, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var column = _mapper.Map<BoardColumn>(boardColumnDto);
@@ -51,6 +54,7 @@ public class BoardColumnController : Controller
     [Route("{id:guid}")]
     public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBoardColumnRequestDto boardColumnDto)
     {
+        // TODO: only for boards in accessible teams, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var column = await _context.BoardColumns.FirstOrDefaultAsync(c => c.Id == id);
@@ -65,9 +69,11 @@ public class BoardColumnController : Controller
     [Route("{id:guid}")]
     public async Task<ActionResult> Delete([FromRoute] Guid id)
     {
+        // TODO: only for boards in accessible teams, for admins/redactors
         var column = await _context.BoardColumns.FirstOrDefaultAsync(c => c.Id == id);
         if (column == null) return NotFound();
         _context.BoardColumns.Remove(column);
+        
         await _context.SaveChangesAsync();
         
         return NoContent();

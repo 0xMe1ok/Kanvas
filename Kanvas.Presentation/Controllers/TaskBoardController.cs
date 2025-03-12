@@ -26,6 +26,7 @@ public class TaskBoardController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
+        // TODO: only from selected and accessible team
         var board = await _context.TaskBoards
             .Include(b => b.Columns)
             .Include(b => b.Tasks)
@@ -41,6 +42,7 @@ public class TaskBoardController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
+        // TODO: only from selected and accessible team
         var boards = await _context.TaskBoards
             .ToListAsync();
         return Ok(_mapper.Map<List<TaskBoardDto>>(boards));
@@ -49,6 +51,7 @@ public class TaskBoardController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateTaskBoardRequestDto taskBoardDto)
     {
+        // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         if (taskBoardDto.TeamId != null && !_context.AppTeams.Any(team => team.Id == taskBoardDto.TeamId))
@@ -101,6 +104,7 @@ public class TaskBoardController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTaskBoardRequestDto taskBoardDto)
     {
+        // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var board = _context.TaskBoards.FirstOrDefault(b => b.Id == id);
@@ -115,6 +119,7 @@ public class TaskBoardController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
+        // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var board = _context.TaskBoards.FirstOrDefault(b => b.Id == id);
         if (board == null) return NotFound();

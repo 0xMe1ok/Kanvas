@@ -11,6 +11,7 @@ namespace Presentation.Controllers;
 [Route("api/tasks")]
 public class AppTaskController : ControllerBase
 {
+    // TODO: in global - change dbcontext -> CQRS
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
@@ -24,6 +25,7 @@ public class AppTaskController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
+        // TODO: only from current team
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return NotFound();
         return Ok(_mapper.Map<AppTaskDto>(task));
@@ -32,6 +34,7 @@ public class AppTaskController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
+        // TODO: only from selected and accessible team
         var tasks = await _context.AppTasks.ToListAsync();
         return Ok(tasks.Select(task => _mapper.Map<AppTaskDto>(task)));
     }
@@ -39,6 +42,7 @@ public class AppTaskController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAppTaskRequestDto appTaskDto)
     {
+        // TODO: only to selected and accessible team
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         if (appTaskDto.BoardId != null && !_context.TaskBoards.Any(b => b.Id == appTaskDto.BoardId))
@@ -47,6 +51,11 @@ public class AppTaskController : ControllerBase
         }
         
         var task = _mapper.Map<AppTask>(appTaskDto);
+        
+        task.ColumnId = _context.BoardColumns
+            .FirstOrDefault(column => column.BoardId == appTaskDto.BoardId 
+            && column.Status == task.Status)?.Id;
+        
         await _context.AppTasks.AddAsync(task);
         await _context.SaveChangesAsync();
         
@@ -57,6 +66,7 @@ public class AppTaskController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTaskRequestDto appTaskDto)
     {
+        // TODO: only to selected and accessible team
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         if (appTaskDto.BoardId != null && !_context.TaskBoards.Any(b => b.Id == appTaskDto.BoardId))
@@ -66,6 +76,14 @@ public class AppTaskController : ControllerBase
         
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return NotFound();
+
+        if (task.Status != appTaskDto.Status)
+        {
+            task.ColumnId = _context.BoardColumns
+                .FirstOrDefault(column => column.BoardId == appTaskDto.BoardId 
+                                          && column.Status == task.Status)?.Id;
+        }
+        
         _mapper.Map(appTaskDto, task);
         await _context.SaveChangesAsync();
         
@@ -76,6 +94,7 @@ public class AppTaskController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
+        // TODO: only to selected and accessible team, not for viewers
         var task = await _context.AppTasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return NotFound();
         _context.AppTasks.Remove(task);

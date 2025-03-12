@@ -27,6 +27,7 @@ public class AppTeamController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
+        // TODO: get all from accessible teams
         var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == id);
         if (team == null) return NotFound();
         return Ok(_mapper.Map<AppTeamDto>(team));
@@ -35,6 +36,7 @@ public class AppTeamController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
+        // TODO: only for accessible teams
         var teams = await _context.AppTeams.ToListAsync();
         return Ok(teams.Select(team => _mapper.Map<AppTeamDto>(team)));
     }
@@ -42,6 +44,7 @@ public class AppTeamController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateTeamRequestDto appTeamDto)
     {
+        // TODO: use userId to ownerId
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var team = _mapper.Map<AppTeam>(appTeamDto);
@@ -55,6 +58,7 @@ public class AppTeamController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTeamRequestDto appTeamDto)
     {
+        // TODO: only for owner
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var team = _context.AppTeams.FirstOrDefault(t => t.Id == id);
@@ -69,6 +73,7 @@ public class AppTeamController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
+        // TODO: only for owner
         var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == id);
         if (team == null) return NotFound();
         _context.AppTeams.Remove(team);
@@ -81,6 +86,7 @@ public class AppTeamController : ControllerBase
     [Route("{teamId}/users/{userId}")]
     public async Task<IActionResult> AddUserToTeam([FromRoute] Guid teamId, [FromRoute] Guid userId)
     {
+        // TODO: only for owner
         var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
         if (team == null) return NotFound();
 
@@ -99,6 +105,7 @@ public class AppTeamController : ControllerBase
     [Route("{teamId}/users/{userId}")]
     public async Task<IActionResult> RemoveUserFromTeam([FromRoute] Guid teamId, [FromRoute] Guid userId)
     {
+        // TODO: only for owner
         var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
         if (team == null) return NotFound();
         
