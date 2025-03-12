@@ -17,6 +17,10 @@ public class AppTaskConfiguration : IEntityTypeConfiguration<AppTask>
             .WithMany(b => b.Tasks)
             .HasForeignKey(t => t.BoardId);
         builder
+            .HasOne(t => t.Column)
+            .WithMany(c => c.Tasks)
+            .HasForeignKey(t => t.ColumnId);
+        builder
             .Property(t => t.Status)
             .HasConversion<string>();
     }
