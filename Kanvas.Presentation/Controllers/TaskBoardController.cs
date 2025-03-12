@@ -26,26 +26,16 @@ public class TaskBoardController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        // TODO: simplify query
         var board = await _context.TaskBoards
-            .Select(board => new
-            {
-                Id = board.Id,
-                Columns = board.Columns
-                    .OrderBy(column => column.Order)
-                    .Select(column => new
-                    {
-                        Column = column,
-                        Tasks = _context.AppTasks
-                            .Where(task => task.BoardId == board.Id && task.Status == column.Status)
-                            .ToList()
-                    })
-            })
+            .Include(b => b.Columns)
+            .Include(b => b.Tasks)
             .FirstOrDefaultAsync(b => b.Id == id);
         
         if (board == null) return NotFound();
+
+        var boardDto = _mapper.Map<TaskBoardDto>(board);
         
-        return Ok(board);
+        return Ok(boardDto);
     }
 
     [HttpGet]
