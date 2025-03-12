@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Presentation.Entities;
 using Presentation.Enums;
 
@@ -9,6 +11,8 @@ public class BoardColumnDto
     public string Name { get; set; } 
     public int Order { get; set; }
     public int? TaskLimit { get; set; }
+    
+    [JsonConverter(typeof(StringEnumConverter))]
     public Status Status { get; set; }
     public Guid BoardId { get; set; }
     

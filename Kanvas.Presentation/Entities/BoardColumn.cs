@@ -4,8 +4,8 @@ namespace Presentation.Entities;
 
 public class BoardColumn : EntityBase<Guid>
 {
-    public string Name { get; set; } 
-    public int Order { get; set; }
+    public string Name { get; set; }
+    public int Order { get; set; } = 0;
     public int? TaskLimit { get; set; }
     public Status Status { get; set; }
     
