@@ -19,6 +19,14 @@ public static class DependencyInjection
                 options.UseNpgsql("Server=127.0.0.1;Port=5432;Database=kanvasdb;Username=pguser;Password=secretpassword;");
             }
         );
+        
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+            options.JsonSerializerOptions.DefaultIgnoreCondition =
+                JsonIgnoreCondition.WhenWritingNull;
+        });
 
         services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
         
