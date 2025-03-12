@@ -10,6 +10,7 @@ public class UpdateAppTaskRequestDto
     
     public DateTime? DueDate { get; set; }
     public Guid? BoardId { get; set; }
+    
     public Status Status { get; set; }
     public Guid? AssigneeId { get; set; }
 }
