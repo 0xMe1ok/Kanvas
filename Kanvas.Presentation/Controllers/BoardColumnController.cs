@@ -26,7 +26,9 @@ public class BoardColumnController : Controller
     public async Task<ActionResult> GetById([FromRoute] Guid id)
     {
         // TODO: only for boards in accessible teams
-        var column = await _context.BoardColumns.FirstOrDefaultAsync(c => c.Id == id);
+        var column = await _context.BoardColumns
+            .Include(column => column.Tasks)
+            .FirstOrDefaultAsync(c => c.Id == id);
         if (column == null) return NotFound();
         return Ok(_mapper.Map<BoardColumnDto>(column));
     }
