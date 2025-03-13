@@ -18,6 +18,7 @@ public class AutomapperConfig : Profile
         CreateMap<AppTeam, AppTeamDto>().ReverseMap();
         CreateMap<CreateTeamRequestDto, AppTeam>();
         CreateMap<UpdateTeamRequestDto, AppTeam>();
+        CreateMap<CreateTaskBoardInTeamRequestDto, AppTeam>();
         
         CreateMap<BoardColumn, BoardColumnDto>().ReverseMap();
         CreateMap<CreateBoardColumnRequestDto, BoardColumn>();

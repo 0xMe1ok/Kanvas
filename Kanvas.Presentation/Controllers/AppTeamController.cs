@@ -6,8 +6,10 @@ using Presentation.Mapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Presentation.DTOs.TaskBoard;
 using Presentation.DTOs.Team;
 using Presentation.Entities;
+using Presentation.Enums;
 
 namespace Presentation.Controllers;
 
@@ -84,9 +86,71 @@ public class AppTeamController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet]
+    [Route("{id:guid}/boards")]
+    public async Task<IActionResult> GetBoards([FromRoute] Guid id)
+    {
+        var boards = await _context.TaskBoards.Where(board => board.TeamId == id).ToListAsync();
+        return Ok(_mapper.Map<IEnumerable<TaskBoardDto>>(boards));
+    }
+    
     [HttpPost]
-    [Route("{teamId}/users/{userId}")]
-    public async Task<IActionResult> AddUserToTeam([FromRoute] Guid teamId, [FromRoute] Guid userId)
+    [Route("{id:guid}/boards")]
+    public async Task<IActionResult> CreateBoard([FromRoute] Guid id, [FromBody] CreateTaskBoardInTeamRequestDto boardDto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        if (!_context.AppTeams.Any(team => team.Id == id))
+        {
+            return NotFound("Team doesn't exist");
+        }
+        
+        var board = _mapper.Map<TaskBoard>(boardDto);
+        board.TeamId = id;
+        await _context.TaskBoards.AddAsync(board);
+
+        var columnsStarterPack = new List<BoardColumn>
+        {
+            new BoardColumn
+            {
+                Id = Guid.NewGuid(),
+                BoardId = board.Id,
+                Name = "ToDo",
+                Order = 0,
+                Status = Status.ToDo,
+                TaskLimit = null
+            },
+            new BoardColumn
+            {
+                Id = Guid.NewGuid(),
+                BoardId = board.Id,
+                Name = "InProgress",
+                Order = 1,
+                Status = Status.InProgress,
+                TaskLimit = null
+            },
+            new BoardColumn
+            {
+                Id = Guid.NewGuid(),
+                BoardId = board.Id,
+                Name = "Done",
+                Order = 2,
+                Status = Status.Done,
+                TaskLimit = null
+            },
+        };
+        
+        await _context.BoardColumns.AddRangeAsync(columnsStarterPack);
+        
+        await _context.SaveChangesAsync();
+        
+        return CreatedAtAction(nameof(GetById), new {id = board.Id}, _mapper.Map<TaskBoardDto>(board));
+    }
+    
+    // TODO: do when user was added
+    [HttpPost]
+    [Route("{teamId}/users/{userId}")] // [Route("{teamId}/users")]
+    public async Task<IActionResult> AddUserToTeam([FromRoute] Guid teamId, [FromRoute] Guid userId) // FromBody] user UsedId
     {
         // TODO: only for owner
         var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
@@ -102,7 +166,8 @@ public class AppTeamController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok();
     }
-
+    
+    // TODO: do when user was added
     [HttpDelete]
     [Route("{teamId}/users/{userId}")]
     public async Task<IActionResult> RemoveUserFromTeam([FromRoute] Guid teamId, [FromRoute] Guid userId)
