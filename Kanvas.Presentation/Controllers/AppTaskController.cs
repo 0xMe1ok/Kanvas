@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using AutoMapper;
 using Presentation;
 using Presentation.DTOs;
@@ -8,7 +9,8 @@ using Presentation.Entities;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/tasks")]
+[Route("api/v{version:apiVersion}/tasks")]
+[ApiVersion("1.0")]
 public class AppTaskController : ControllerBase
 {
     // TODO: in global - change dbcontext -> CQRS
@@ -52,9 +54,10 @@ public class AppTaskController : ControllerBase
         
         var task = _mapper.Map<AppTask>(appTaskDto);
         
-        task.ColumnId = _context.BoardColumns
-            .FirstOrDefault(column => column.BoardId == appTaskDto.BoardId 
-            && column.Status == task.Status)?.Id;
+        var column = await _context.BoardColumns
+            .FirstOrDefaultAsync(column => column.BoardId == appTaskDto.BoardId 
+                                           && column.Status == task.Status);
+        task.ColumnId = column?.Id;
         
         await _context.AppTasks.AddAsync(task);
         await _context.SaveChangesAsync();
@@ -79,9 +82,10 @@ public class AppTaskController : ControllerBase
 
         if (task.Status != appTaskDto.Status)
         {
-            task.ColumnId = _context.BoardColumns
-                .FirstOrDefault(column => column.BoardId == appTaskDto.BoardId 
-                                          && column.Status == task.Status)?.Id;
+            var column = await _context.BoardColumns
+                .FirstOrDefaultAsync(column => column.BoardId == appTaskDto.BoardId 
+                                          && column.Status == task.Status);
+            task.ColumnId = column?.Id;
         }
         
         _mapper.Map(appTaskDto, task);

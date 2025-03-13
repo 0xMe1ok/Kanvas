@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using AutoMapper;
 using Presentation;
 using Presentation.DTOs;
@@ -11,7 +12,8 @@ using Presentation.Entities;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/teams")]
+[Route("api/v{version:apiVersion}/teams")]
+[ApiVersion("1.0")]
 public class AppTeamController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

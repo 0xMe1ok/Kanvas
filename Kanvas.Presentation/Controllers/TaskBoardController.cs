@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,8 @@ using Presentation.Enums;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/boards")]
+[Route("api/v{version:apiVersion}/boards")]
+[ApiVersion("1.0")]
 public class TaskBoardController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

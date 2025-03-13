@@ -15,6 +15,8 @@ public static class DependencyInjection
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
         
+        services.AddApiVersioning();
+        
         services.AddDbContext<ApplicationDbContext>(options => {
                 options.UseNpgsql("Server=127.0.0.1;Port=5432;Database=kanvasdb;Username=pguser;Password=secretpassword;");
             }
