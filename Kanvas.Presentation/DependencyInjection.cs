@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using Presentation;
 using Presentation.Mapper;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Interfaces;
+using Presentation.Repositories;
 
 namespace Presentation;
 
@@ -29,6 +31,12 @@ public static class DependencyInjection
             options.JsonSerializerOptions.DefaultIgnoreCondition =
                 JsonIgnoreCondition.WhenWritingNull;
         });
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IAppTaskRepository, AppTaskRepository>();
+        services.AddScoped<IAppTeamRepository, AppTeamRepository>();
+        services.AddScoped<IBoardColumnRepository, BoardColumnRepository>();
+        services.AddScoped<ITaskBoardRepository, TaskBoardRepository>();
 
         services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
         

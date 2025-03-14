@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Repositories;
 
 public abstract class Repository<TEntity> where TEntity : class
 {
@@ -35,5 +35,10 @@ public abstract class Repository<TEntity> where TEntity : class
     {
         return await _context.Set<TEntity>()
             .FindAsync(id);
+    }
+
+    public virtual async Task<bool> Exists()
+    {
+        return await _context.Set<TEntity>().AnyAsync();
     }
 }
