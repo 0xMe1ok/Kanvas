@@ -1,6 +1,8 @@
+using Presentation.Entities;
+
 namespace Presentation.Interfaces;
 
-public interface IAppTaskRepository
+public interface IAppTaskRepository : IRepository<AppTask>
 {
     
 }

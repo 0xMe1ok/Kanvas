@@ -3,7 +3,7 @@ using Presentation.Interfaces;
 
 namespace Presentation.Repositories;
 
-public class UnitOfWork : IUnitOfWork, IDisposable
+public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
     

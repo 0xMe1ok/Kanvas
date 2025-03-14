@@ -1,6 +1,8 @@
+using Presentation.Entities;
+
 namespace Presentation.Interfaces;
 
-public interface IBoardColumnRepository
+public interface IBoardColumnRepository : IRepository<BoardColumn>
 {
     
 }

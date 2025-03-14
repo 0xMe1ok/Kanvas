@@ -1,6 +1,8 @@
+using Presentation.Entities;
+
 namespace Presentation.Interfaces;
 
-public interface ITaskBoardRepository
+public interface ITaskBoardRepository : IRepository<TaskBoard>
 {
     
 }

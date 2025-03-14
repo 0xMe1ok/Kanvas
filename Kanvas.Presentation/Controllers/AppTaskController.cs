@@ -5,6 +5,7 @@ using Presentation.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Entities;
+using Presentation.Interfaces;
 
 namespace Presentation.Controllers;
 
