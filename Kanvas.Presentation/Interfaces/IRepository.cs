@@ -1,12 +1,17 @@
+using System.Linq.Expressions;
+
 namespace Presentation.Interfaces;
 
 public interface IRepository<TEntity> where TEntity : class
 {
-    void Add(TEntity entity);
+    Task AddAsync(TEntity entity);
     void Update(TEntity entity);
     void Remove(TEntity entity);
 
     Task<IEnumerable<TEntity>> GetAllAsync();
     Task<TEntity?> GetByIdAsync(Guid id);
-    Task<bool> Exists();
+    Task<bool> ExistsAsync(Guid id);
+    
+    Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate);
 }

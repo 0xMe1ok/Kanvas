@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Entities;
 
 namespace Presentation.Repositories;
 
-public abstract class Repository<TEntity> where TEntity : class
+public abstract class Repository<TEntity> where TEntity : EntityBase<Guid>
 {
     protected readonly ApplicationDbContext _context;
 
@@ -11,9 +13,9 @@ public abstract class Repository<TEntity> where TEntity : class
         _context = context;
     }
 
-    public virtual void Add(TEntity entity)
+    public virtual async Task AddAsync(TEntity entity)
     {
-        _context.Set<TEntity>().Add(entity);
+        await _context.Set<TEntity>().AddAsync(entity);
     }
 
     public virtual void Update(TEntity entity)
@@ -37,8 +39,18 @@ public abstract class Repository<TEntity> where TEntity : class
             .FindAsync(id);
     }
 
-    public virtual async Task<bool> Exists()
+    public virtual async Task<bool> ExistsAsync(Guid id)
     {
-        return await _context.Set<TEntity>().AnyAsync();
+        return await _context.Set<TEntity>().AnyAsync(e => e.Id == id);
+    }
+
+    public virtual async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return await _context.Set<TEntity>().Where(predicate).FirstOrDefaultAsync();
+    }
+    
+    public virtual async Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return await _context.Set<TEntity>().Where(predicate).ToListAsync();
     }
 }
