@@ -10,6 +10,7 @@ using Presentation.DTOs.TaskBoard;
 using Presentation.DTOs.Team;
 using Presentation.Entities;
 using Presentation.Enums;
+using Presentation.Interfaces;
 
 namespace Presentation.Controllers;
 
@@ -18,12 +19,12 @@ namespace Presentation.Controllers;
 [ApiVersion("1.0")]
 public class AppTeamController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public AppTeamController(ApplicationDbContext context, IMapper mapper)
+    public AppTeamController(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -32,7 +33,7 @@ public class AppTeamController : ControllerBase
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         // TODO: get all from accessible teams
-        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == id);
+        var team = await _unitOfWork.Teams.GetByIdAsync(id);
         if (team == null) return NotFound();
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
@@ -41,7 +42,7 @@ public class AppTeamController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         // TODO: only for accessible teams
-        var teams = await _context.AppTeams.ToListAsync();
+        var teams = await _unitOfWork.Teams.GetAllAsync();
         return Ok(teams.Select(team => _mapper.Map<AppTeamDto>(team)));
     }
 
@@ -52,8 +53,8 @@ public class AppTeamController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var team = _mapper.Map<AppTeam>(appTeamDto);
-        _context.AppTeams.Add(team);
-        await _context.SaveChangesAsync();
+        await _unitOfWork.Teams.AddAsync(team);
+        await _unitOfWork.CommitAsync();
         
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
@@ -65,10 +66,10 @@ public class AppTeamController : ControllerBase
         // TODO: only for owner
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var team = _context.AppTeams.FirstOrDefault(t => t.Id == id);
+        var team = await _unitOfWork.Teams.GetByIdAsync(id);
         if (team == null) return NotFound();
         _mapper.Map(appTeamDto, team);
-        await _context.SaveChangesAsync();
+        await _unitOfWork.CommitAsync();
         
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
@@ -78,10 +79,10 @@ public class AppTeamController : ControllerBase
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         // TODO: only for owner
-        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == id);
+        var team = await _unitOfWork.Teams.GetByIdAsync(id);
         if (team == null) return NotFound();
-        _context.AppTeams.Remove(team);
-        await _context.SaveChangesAsync();
+        _unitOfWork.Teams.Remove(team);
+        await _unitOfWork.CommitAsync();
         
         return NoContent();
     }
@@ -90,7 +91,7 @@ public class AppTeamController : ControllerBase
     [Route("{id:guid}/boards")]
     public async Task<IActionResult> GetBoards([FromRoute] Guid id)
     {
-        var boards = await _context.TaskBoards.Where(board => board.TeamId == id).ToListAsync();
+        var boards = await _unitOfWork.Boards.FindAllAsync(board => board.TeamId == id);
         return Ok(_mapper.Map<IEnumerable<TaskBoardDto>>(boards));
     }
     
@@ -100,15 +101,16 @@ public class AppTeamController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        if (!_context.AppTeams.Any(team => team.Id == id))
+        if (await _unitOfWork.Teams.ExistsAsync(id))
         {
             return NotFound("Team doesn't exist");
         }
         
         var board = _mapper.Map<TaskBoard>(boardDto);
         board.TeamId = id;
-        await _context.TaskBoards.AddAsync(board);
-
+        await _unitOfWork.Boards.AddAsync(board);
+        
+        // TODO: move to service
         var columnsStarterPack = new List<BoardColumn>
         {
             new BoardColumn
@@ -139,31 +141,19 @@ public class AppTeamController : ControllerBase
                 TaskLimit = null
             },
         };
-        
-        await _context.BoardColumns.AddRangeAsync(columnsStarterPack);
-        
-        await _context.SaveChangesAsync();
+
+        await _unitOfWork.Columns.AddRangeAsync(columnsStarterPack);
+        await _unitOfWork.CommitAsync();
         
         return CreatedAtAction(nameof(GetById), new {id = board.Id}, _mapper.Map<TaskBoardDto>(board));
     }
     
     // TODO: do when user was added
     [HttpPost]
-    [Route("{teamId}/users/{userId}")] // [Route("{teamId}/users")]
+    [Route("{teamId}/users")] // [Route("{teamId}/users")]
     public async Task<IActionResult> AddUserToTeam([FromRoute] Guid teamId, [FromRoute] Guid userId) // FromBody] user UsedId
     {
         // TODO: only for owner
-        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
-        if (team == null) return NotFound();
-
-        var membership = new TeamMember
-        {
-            MemberId = userId,
-            TeamId = teamId
-        };
-        
-        _context.TeamMembers.Add(membership);
-        await _context.SaveChangesAsync();
         return Ok();
     }
     
@@ -173,15 +163,6 @@ public class AppTeamController : ControllerBase
     public async Task<IActionResult> RemoveUserFromTeam([FromRoute] Guid teamId, [FromRoute] Guid userId)
     {
         // TODO: only for owner
-        var team = await _context.AppTeams.FirstOrDefaultAsync(t => t.Id == teamId);
-        if (team == null) return NotFound();
-        
-        var membership = await _context.TeamMembers.FirstOrDefaultAsync(t => t.MemberId == userId);
-        if (membership == null) return NotFound();
-        
-        _context.TeamMembers.Remove(membership);
-        await _context.SaveChangesAsync();
-        
         return Ok();
     }
     

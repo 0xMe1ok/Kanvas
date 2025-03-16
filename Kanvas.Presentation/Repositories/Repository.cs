@@ -30,7 +30,7 @@ public abstract class Repository<TEntity> where TEntity : EntityBase<Guid>
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
-        return await _context.Set<TEntity>().ToListAsync();
+        return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
     }
     
     public virtual async Task<TEntity?> GetByIdAsync(Guid id)

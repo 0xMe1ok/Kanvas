@@ -7,6 +7,7 @@ using Presentation.DTOs.BoardColumn;
 using Presentation.DTOs.TaskBoard;
 using Presentation.Entities;
 using Presentation.Enums;
+using Presentation.Interfaces;
 
 namespace Presentation.Controllers;
 
@@ -15,12 +16,12 @@ namespace Presentation.Controllers;
 [ApiVersion("1.0")]
 public class TaskBoardController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public TaskBoardController(ApplicationDbContext context, IMapper mapper)
+    public TaskBoardController(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -29,11 +30,7 @@ public class TaskBoardController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         // TODO: only from selected and accessible team
-        var board = await _context.TaskBoards
-            .Include(b => b.Columns)
-            .Include(b => b.Tasks)
-            .FirstOrDefaultAsync(b => b.Id == id);
-        
+        var board = await _unitOfWork.Boards.GetByIdAsync(id);
         if (board == null) return NotFound();
 
         var boardDto = _mapper.Map<TaskBoardDto>(board);
@@ -45,8 +42,7 @@ public class TaskBoardController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         // TODO: only from selected and accessible team
-        var boards = await _context.TaskBoards
-            .ToListAsync();
+        var boards = await _unitOfWork.Boards.GetAllAsync();
         return Ok(_mapper.Map<List<TaskBoardDto>>(boards));
     }
 
@@ -56,13 +52,13 @@ public class TaskBoardController : ControllerBase
         // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        if (taskBoardDto.TeamId != null && !_context.AppTeams.Any(team => team.Id == taskBoardDto.TeamId))
+        if (!await _unitOfWork.Teams.ExistsAsync(taskBoardDto.TeamId))
         {
             return NotFound("Team doesn't exist");
         }
         
         var board = _mapper.Map<TaskBoard>(taskBoardDto);
-        await _context.TaskBoards.AddAsync(board);
+        await _unitOfWork.Boards.AddAsync(board);
 
         var columnsStarterPack = new List<BoardColumn>
         {
@@ -95,9 +91,8 @@ public class TaskBoardController : ControllerBase
             },
         };
         
-        await _context.BoardColumns.AddRangeAsync(columnsStarterPack);
-        
-        await _context.SaveChangesAsync();
+        await _unitOfWork.Columns.AddRangeAsync(columnsStarterPack);
+        await _unitOfWork.CommitAsync();
         
         return CreatedAtAction(nameof(GetById), new {id = board.Id}, _mapper.Map<TaskBoardDto>(board));
     }
@@ -109,10 +104,10 @@ public class TaskBoardController : ControllerBase
         // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var board = _context.TaskBoards.FirstOrDefault(b => b.Id == id);
+        var board = await _unitOfWork.Boards.GetByIdAsync(id);
         if (board == null) return NotFound();
         _mapper.Map(taskBoardDto, board);
-        await _context.SaveChangesAsync();
+        await _unitOfWork.CommitAsync();
         
         return Ok(taskBoardDto);
     }
@@ -123,16 +118,12 @@ public class TaskBoardController : ControllerBase
     {
         // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var board = _context.TaskBoards.FirstOrDefault(b => b.Id == id);
+        var board = await _unitOfWork.Boards.GetByIdAsync(id);
         if (board == null) return NotFound();
-        
-        var tasks = _context.AppTasks.Where(task => task.BoardId == id);
-        
-        foreach (var task in tasks)
-            task.BoardId = null;
-        
-        _context.TaskBoards.Remove(board);
-        await _context.SaveChangesAsync();
+
+        await _unitOfWork.Tasks.ClearBoardIdInBoard(id);
+        _unitOfWork.Boards.Remove(board);
+        await _unitOfWork.CommitAsync();
         
         return NoContent();
     }

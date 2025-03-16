@@ -1,10 +1,12 @@
 using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Presentation;
 using Presentation.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Entities;
+using Presentation.Enums;
 using Presentation.Interfaces;
 
 namespace Presentation.Controllers;
@@ -87,7 +89,7 @@ public class AppTaskController : ControllerBase
         {
             var column = await _unitOfWork.Columns
                 .FindAsync(column => column.BoardId == appTaskDto.BoardId 
-                                          && column.Status == task.Status);
+                                          && column.Status == appTaskDto.Status);
             task.ColumnId = column?.Id;
         }
         
@@ -96,6 +98,27 @@ public class AppTaskController : ControllerBase
         
         return Ok(appTaskDto);
     }
+    
+    /*
+    [HttpPatch]
+    [Route("{id:guid}")]
+    public async Task<IActionResult> Patch([FromRoute] Guid id, [FromBody] JsonPatchDocument<AppTaskDto>? patchDoc)
+    {
+        if (patchDoc == null) return BadRequest();
+        
+        var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+        if (task == null) return NotFound();
+        
+        var taskDto = _mapper.Map<AppTaskDto>(task);
+        patchDoc.ApplyTo(taskDto, ModelState);
+        
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        _mapper.Map(taskDto, task);
+        await _unitOfWork.CommitAsync();
+        
+        return Ok(_mapper.Map<AppTaskDto>(task));
+    }
+    */
 
     [HttpDelete]
     [Route("{id:guid}")]

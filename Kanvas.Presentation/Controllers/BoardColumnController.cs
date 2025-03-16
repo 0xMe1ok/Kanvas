@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.DTOs.BoardColumn;
 using Presentation.Entities;
+using Presentation.Interfaces;
 
 namespace Presentation.Controllers;
 
@@ -12,12 +13,12 @@ namespace Presentation.Controllers;
 [ApiVersion("1.0")]
 public class BoardColumnController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public BoardColumnController(ApplicationDbContext context, IMapper mapper)
+    public BoardColumnController(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
     
@@ -26,9 +27,7 @@ public class BoardColumnController : Controller
     public async Task<ActionResult> GetById([FromRoute] Guid id)
     {
         // TODO: only for boards in accessible teams
-        var column = await _context.BoardColumns
-            .Include(column => column.Tasks)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        var column = await _unitOfWork.Columns.GetByIdAsync(id);
         if (column == null) return NotFound();
         return Ok(_mapper.Map<BoardColumnDto>(column));
     }
@@ -37,7 +36,7 @@ public class BoardColumnController : Controller
     public async Task<ActionResult> GetAll()
     {
         // TODO: only for boards in accessible teams
-        var columns = _context.BoardColumns.Include(c => c.Tasks).ToList();
+        var columns = await _unitOfWork.Columns.GetAllAsync();
         return Ok(_mapper.Map<List<BoardColumnDto>>(columns));
     }
 
@@ -49,8 +48,8 @@ public class BoardColumnController : Controller
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
         var column = _mapper.Map<BoardColumn>(boardColumnDto);
-        _context.BoardColumns.Add(column);
-        await _context.SaveChangesAsync();
+        await _unitOfWork.Columns.AddAsync(column);
+        await _unitOfWork.CommitAsync();
         
         return Ok(_mapper.Map<BoardColumnDto>(column));
     }
@@ -63,10 +62,10 @@ public class BoardColumnController : Controller
         // TODO: check for valid status, there can't be two columns with the same status
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var column = await _context.BoardColumns.FirstOrDefaultAsync(c => c.Id == id);
+        var column = await _unitOfWork.Columns.GetByIdAsync(id);
         if (column == null) return NotFound();
         _mapper.Map(boardColumnDto, column);
-        await _context.SaveChangesAsync();
+        await _unitOfWork.CommitAsync();
         
         return Ok(_mapper.Map<BoardColumnDto>(column));
     }
@@ -76,14 +75,12 @@ public class BoardColumnController : Controller
     public async Task<ActionResult> Delete([FromRoute] Guid id)
     {
         // TODO: only for boards in accessible teams, for admins/redactors
-        var column = await _context.BoardColumns.FirstOrDefaultAsync(c => c.Id == id);
+        var column = await _unitOfWork.Columns.GetByIdAsync(id);
         if (column == null) return NotFound();
-        _context.BoardColumns.Remove(column);
+        _unitOfWork.Columns.Remove(column);
 
-        var columnTasks = await _context.AppTasks.Where(t => t.ColumnId == id).ToListAsync();
-        columnTasks.ForEach(task => task.ColumnId = null);
-        
-        await _context.SaveChangesAsync();
+        await _unitOfWork.Tasks.ClearColumnIdInColumn(id);
+        await _unitOfWork.CommitAsync();
         
         return NoContent();
     }
