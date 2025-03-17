@@ -12,4 +12,6 @@ public interface IAppTaskService
     
     Task UpdateTaskAsync(Guid id, UpdateAppTaskDto taskDto);
     Task DeleteTaskAsync(Guid id);
+    
+    //Task UpdateTaskStatusAsync(Guid id, UpdateAppTaskStatusDto taskDto);
 }
