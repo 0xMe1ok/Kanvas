@@ -1,7 +1,6 @@
 namespace Presentation.DTOs.TaskBoard;
 
-public class CreateTaskBoardRequestDto
+public class UpdateTaskBoardDto
 {
     public string Name { get; set; }
-    public Guid TeamId { get; set; }
 }

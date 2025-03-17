@@ -1,6 +1,6 @@
 namespace Presentation.DTOs.Team;
 
-public class UpdateTeamRequestDto
+public class CreateAppTeamDto
 {
     public string Name { get; set; }
 }

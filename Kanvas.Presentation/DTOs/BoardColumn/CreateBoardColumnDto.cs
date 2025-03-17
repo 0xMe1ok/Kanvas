@@ -2,7 +2,7 @@ using Presentation.Enums;
 
 namespace Presentation.DTOs.BoardColumn;
 
-public class CreateBoardColumnRequestDto
+public class CreateBoardColumnDto
 {
     public string Name { get; set; } 
     public int? TaskLimit { get; set; }
