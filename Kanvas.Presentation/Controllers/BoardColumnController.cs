@@ -41,7 +41,7 @@ public class BoardColumnController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] CreateBoardColumnRequestDto boardColumnDto)
+    public async Task<ActionResult> Create([FromBody] CreateBoardColumnDto boardColumnDto)
     {
         // TODO: only for boards in accessible teams, for admins/redactors
         // TODO: check for valid status, there can't be two columns with the same status
@@ -56,7 +56,7 @@ public class BoardColumnController : Controller
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBoardColumnRequestDto boardColumnDto)
+    public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] UpdateBoardColumnDto boardColumnDto)
     {
         // TODO: only for boards in accessible teams, for admins/redactors
         // TODO: check for valid status, there can't be two columns with the same status

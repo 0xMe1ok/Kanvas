@@ -47,7 +47,7 @@ public class TaskBoardController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTaskBoardRequestDto taskBoardDto)
+    public async Task<IActionResult> Create([FromBody] CreateTaskBoardDto taskBoardDto)
     {
         // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -99,7 +99,7 @@ public class TaskBoardController : ControllerBase
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTaskBoardRequestDto taskBoardDto)
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTaskBoardDto taskBoardDto)
     {
         // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);

@@ -47,12 +47,12 @@ public class AppTeamController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTeamRequestDto appTeamDto)
+    public async Task<IActionResult> Create([FromBody] CreateAppTeamDto appAppTeamDto)
     {
         // TODO: use userId to ownerId
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var team = _mapper.Map<AppTeam>(appTeamDto);
+        var team = _mapper.Map<AppTeam>(appAppTeamDto);
         await _unitOfWork.Teams.AddAsync(team);
         await _unitOfWork.CommitAsync();
         
@@ -61,7 +61,7 @@ public class AppTeamController : ControllerBase
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTeamRequestDto appTeamDto)
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateTeamDto appTeamDto)
     {
         // TODO: only for owner
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -97,7 +97,7 @@ public class AppTeamController : ControllerBase
     
     [HttpPost]
     [Route("{id:guid}/boards")]
-    public async Task<IActionResult> CreateBoard([FromRoute] Guid id, [FromBody] CreateTaskBoardInTeamRequestDto boardDto)
+    public async Task<IActionResult> CreateBoard([FromRoute] Guid id, [FromBody] CreateTaskBoardInTeamDto boardDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
