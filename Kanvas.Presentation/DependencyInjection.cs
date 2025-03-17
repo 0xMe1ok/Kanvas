@@ -3,8 +3,10 @@ using Asp.Versioning;
 using Presentation;
 using Presentation.Mapper;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Exceptions;
 using Presentation.Interfaces;
 using Presentation.Repositories;
+using Presentation.Services;
 
 namespace Presentation;
 
@@ -48,6 +50,8 @@ public static class DependencyInjection
         services.AddScoped<IAppTeamRepository, AppTeamRepository>();
         services.AddScoped<IBoardColumnRepository, BoardColumnRepository>();
         services.AddScoped<ITaskBoardRepository, TaskBoardRepository>();
+
+        services.AddScoped<IAppTaskService, AppTaskService>();
 
         services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
         

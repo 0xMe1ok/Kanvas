@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Entities;
 using Presentation.Enums;
+using Presentation.Exceptions;
 using Presentation.Interfaces;
 
 namespace Presentation.Controllers;
@@ -17,11 +18,16 @@ namespace Presentation.Controllers;
 public class AppTaskController : ControllerBase
 {
     // TODO: in global - change dbcontext -> CQRS
+    private readonly IAppTaskService _appTaskService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public AppTaskController(IUnitOfWork unitOfWork, IMapper mapper)
+    public AppTaskController
+        (IAppTaskService appTaskService, 
+            IUnitOfWork unitOfWork, 
+            IMapper mapper)
     {
+        _appTaskService = appTaskService;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
@@ -30,72 +36,33 @@ public class AppTaskController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        // TODO: only from current team
-        var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-        if (task == null) return NotFound();
+        var task = await _appTaskService.GetTaskAsync(id);
         return Ok(_mapper.Map<AppTaskDto>(task));
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        // TODO: only from selected and accessible team
-        var tasks = await _unitOfWork.Tasks.GetAllAsync();
+        var tasks = await _appTaskService.GetTasksAsync();
         return Ok(tasks.Select(task => _mapper.Map<AppTaskDto>(task)));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateAppTaskRequestDto appTaskDto)
+    public async Task<IActionResult> Create([FromBody] CreateAppTaskDto appTaskDto)
     {
         // TODO: only to selected and accessible team
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
-        if (appTaskDto.BoardId != null && 
-            !await _unitOfWork.Boards.ExistsAsync(appTaskDto.BoardId ?? Guid.Empty))
-        {
-            return NotFound("Board doesn't exist");
-        }
-        
-        var task = _mapper.Map<AppTask>(appTaskDto);
-        
-        var column = await _unitOfWork.Columns
-            .FindAsync(column => column.BoardId == appTaskDto.BoardId 
-                                           && column.Status == task.Status);
-        task.ColumnId = column?.Id;
-        
-        await _unitOfWork.Tasks.AddAsync(task);
-        await _unitOfWork.CommitAsync();
-        
+        var task = await _appTaskService.CreateNewTask(appTaskDto);
         return CreatedAtAction(nameof(GetById), new { id = task.Id }, _mapper.Map<AppTaskDto>(task));
     }
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTaskRequestDto appTaskDto)
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTaskDto appTaskDto)
     {
         // TODO: only to selected and accessible team
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
-        if (appTaskDto.BoardId != null && 
-            !await _unitOfWork.Boards.ExistsAsync(appTaskDto.BoardId ?? Guid.Empty))
-        {
-            return NotFound("Board doesn't exist");
-        }
-        
-        var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-        if (task == null) return NotFound();
-
-        if (task.Status != appTaskDto.Status)
-        {
-            var column = await _unitOfWork.Columns
-                .FindAsync(column => column.BoardId == appTaskDto.BoardId 
-                                          && column.Status == appTaskDto.Status);
-            task.ColumnId = column?.Id;
-        }
-        
-        _mapper.Map(appTaskDto, task);
-        await _unitOfWork.CommitAsync();
-        
+        await _appTaskService.UpdateTaskAsync(id, appTaskDto);
         return Ok(appTaskDto);
     }
     
@@ -125,11 +92,7 @@ public class AppTaskController : ControllerBase
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         // TODO: only to selected and accessible team, not for viewers
-        var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-        if (task == null) return NotFound();
-        _unitOfWork.Tasks.Remove(task);
-        await _unitOfWork.CommitAsync();
-        
+        await _appTaskService.DeleteTaskAsync(id);
         return NoContent();
     }
 }

@@ -31,8 +31,8 @@
 
     <ItemGroup>
       <Folder Include="CQRS\" />
+      <Folder Include="Identity\" />
       <Folder Include="Migrations\" />
-      <Folder Include="Services\" />
     </ItemGroup>
 
 </Project>
