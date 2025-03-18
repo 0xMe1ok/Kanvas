@@ -8,6 +8,7 @@ public class CreateAppTaskDto
     public string Description { get; set; }
     public DateTime? DueDate { get; set; }
     
+    public Guid TeamId { get; set; }
     public Guid? BoardId { get; set; }
     public Guid? AssigneeId { get; set; }
 }

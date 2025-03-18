@@ -12,8 +12,11 @@ public class AppTaskDto
     
     public DateTime CreatedAt { get; set; }
     public DateTime? DueDate { get; set; }
+    public Guid TeamId { get; set; }
     public Guid? BoardId { get; set; }
     public Guid? ColumnId { get; set; }
+    
+    public int Order { get; set; }
     
     [JsonConverter(typeof(StringEnumConverter))]
     public Status Status { get; set; }

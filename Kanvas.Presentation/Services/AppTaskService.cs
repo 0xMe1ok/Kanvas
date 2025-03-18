@@ -32,6 +32,11 @@ public class AppTaskService : IAppTaskService
                                  && column.Status == task.Status);
         task.ColumnId = column?.Id;
         
+        var currentMaxOrder = await _unitOfWork.Tasks
+            .GetMaxOrderInColumnAsync(task.ColumnId ?? Guid.Empty);
+        
+        task.Order = currentMaxOrder + 1;
+        
         await _unitOfWork.Tasks.AddAsync(task);
         await _unitOfWork.CommitAsync();
         
