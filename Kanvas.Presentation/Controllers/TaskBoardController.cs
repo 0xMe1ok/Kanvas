@@ -121,7 +121,7 @@ public class TaskBoardController : ControllerBase
         var board = await _unitOfWork.Boards.GetByIdAsync(id);
         if (board == null) return NotFound();
 
-        await _unitOfWork.Tasks.ClearBoardIdInBoard(id);
+        await _unitOfWork.Tasks.ClearBoardIdInBoardAsync(id);
         _unitOfWork.Boards.Remove(board);
         await _unitOfWork.CommitAsync();
         
