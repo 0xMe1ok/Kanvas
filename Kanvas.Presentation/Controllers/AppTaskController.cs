@@ -65,6 +65,28 @@ public class AppTaskController : ControllerBase
         await _appTaskService.UpdateTaskAsync(id, appTaskDto);
         return Ok(appTaskDto);
     }
+
+    [HttpPatch]
+    [Route("{id:guid}/order")]
+    public async Task<IActionResult> Move([FromRoute] Guid id, [FromBody] MoveAppTaskDto appTaskDto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
+        await _appTaskService.MoveTaskAsync(id, appTaskDto.NewOrder);
+        
+        return Ok(appTaskDto);
+    }
+
+    [HttpPatch]
+    [Route("{id:guid}/status")]
+    public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] ChangeStatusAppTaskDto appTaskDto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
+        await _appTaskService.ChangeTaskStatusAsync(id, appTaskDto.NewStatus);
+        
+        return Ok(appTaskDto);
+    }
     
     /*
     [HttpPatch]
