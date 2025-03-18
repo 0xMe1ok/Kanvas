@@ -12,7 +12,7 @@ using Presentation;
 namespace Presentation.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250312125433_Initial")]
+    [Migration("20250318072335_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -46,7 +46,7 @@ namespace Presentation.Migrations
                     b.Property<Guid>("CreatedBy")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValue(new Guid("9789891e-7788-479f-a2b1-cb5be99a0af9"));
+                        .HasDefaultValue(new Guid("d640d006-403c-4fe5-bdb9-e4c7b1a8b1ee"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -66,11 +66,16 @@ namespace Presentation.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
 
                     b.HasIndex("ColumnId");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("Tasks", (string)null);
                 });
@@ -88,7 +93,7 @@ namespace Presentation.Migrations
                     b.Property<Guid>("OwnerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValue(new Guid("f190fe74-5fc3-4023-ab57-5c4ae30c1cde"));
+                        .HasDefaultValue(new Guid("1e2ad15b-7bdd-4b9c-96fa-ed60fefddd69"));
 
                     b.HasKey("Id");
 
@@ -169,9 +174,17 @@ namespace Presentation.Migrations
                         .WithMany("Tasks")
                         .HasForeignKey("ColumnId");
 
+                    b.HasOne("Presentation.Entities.AppTeam", "Team")
+                        .WithMany("Tasks")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Board");
 
                     b.Navigation("Column");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Presentation.Entities.BoardColumn", b =>
@@ -199,6 +212,8 @@ namespace Presentation.Migrations
             modelBuilder.Entity("Presentation.Entities.AppTeam", b =>
                 {
                     b.Navigation("Boards");
+
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("Presentation.Entities.BoardColumn", b =>

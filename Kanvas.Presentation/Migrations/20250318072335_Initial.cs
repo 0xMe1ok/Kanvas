@@ -29,7 +29,7 @@ namespace Presentation.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("f190fe74-5fc3-4023-ab57-5c4ae30c1cde"))
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("1e2ad15b-7bdd-4b9c-96fa-ed60fefddd69"))
                 },
                 constraints: table =>
                 {
@@ -89,8 +89,9 @@ namespace Presentation.Migrations
                     DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     BoardId = table.Column<Guid>(type: "uuid", nullable: true),
                     ColumnId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TeamId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("9789891e-7788-479f-a2b1-cb5be99a0af9")),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false, defaultValue: new Guid("d640d006-403c-4fe5-bdb9-e4c7b1a8b1ee")),
                     AssigneeId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -106,6 +107,12 @@ namespace Presentation.Migrations
                         column: x => x.ColumnId,
                         principalTable: "Columns",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Tasks_Teams_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Teams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -127,6 +134,11 @@ namespace Presentation.Migrations
                 name: "IX_Tasks_ColumnId",
                 table: "Tasks",
                 column: "ColumnId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tasks_TeamId",
+                table: "Tasks",
+                column: "TeamId");
         }
 
         /// <inheritdoc />

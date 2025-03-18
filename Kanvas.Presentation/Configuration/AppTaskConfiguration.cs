@@ -20,6 +20,9 @@ public class AppTaskConfiguration : IEntityTypeConfiguration<AppTask>
             .HasOne(t => t.Column)
             .WithMany(c => c.Tasks)
             .HasForeignKey(t => t.ColumnId);
+        builder.HasOne(t => t.Team)
+            .WithMany(t => t.Tasks)
+            .HasForeignKey(t => t.TeamId);
         builder
             .Property(t => t.Status)
             .HasConversion<string>();
