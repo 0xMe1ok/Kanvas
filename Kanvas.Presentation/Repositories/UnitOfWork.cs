@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Presentation.Interfaces;
 
 namespace Presentation.Repositories;
@@ -38,7 +39,12 @@ public class UnitOfWork : IUnitOfWork
         
         return Task.CompletedTask;
     }
-    
+
+    public Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        return _context.Database.BeginTransactionAsync();
+    }
+
     public void Dispose()
     {
         _context.Dispose();
