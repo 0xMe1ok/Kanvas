@@ -1,6 +1,7 @@
 using AutoMapper;
 using Presentation.DTOs;
 using Presentation.Entities;
+using Presentation.Enums;
 using Presentation.Exceptions;
 using Presentation.Interfaces;
 
@@ -74,6 +75,74 @@ public class AppTaskService : IAppTaskService
         
         _mapper.Map(taskDto, task);
         await _unitOfWork.CommitAsync();
+    }
+
+    public async Task MoveTaskAsync(Guid id, int order)
+    {
+        using (var transaction = await _unitOfWork.BeginTransactionAsync())
+        {
+            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+            if (task == null) throw new NotFoundException("Task doesn't exist");
+            
+            if (task.ColumnId == null) throw new ForbiddenException("Task doesn't have column");
+            
+            if (task.Order != order)
+            {
+                var currentMaxOrder = await _unitOfWork.Tasks
+                    .GetMaxOrderInColumnAsync(task.ColumnId ?? Guid.Empty);
+                
+                order = Math.Clamp(order, 1, currentMaxOrder + 1);
+                
+                if (task.Order < order)
+                {
+                    await _unitOfWork.Tasks.ShiftTasksOrderAsync(
+                        task.ColumnId ?? Guid.Empty,
+                        task.Order + 1,
+                        order,
+                        -1);
+                }
+                else
+                {
+                    await _unitOfWork.Tasks.ShiftTasksOrderAsync(
+                        task.ColumnId ?? Guid.Empty,
+                        order,
+                        task.Order - 1,
+                        1);
+                }
+                
+                task.Order = order;
+                _unitOfWork.Tasks.Update(task);
+
+                await _unitOfWork.CommitAsync();
+                await transaction.CommitAsync();
+            }
+        }
+    }
+
+    public async Task ChangeTaskStatusAsync(Guid id, Status status)
+    {
+        using (var transaction = await _unitOfWork.BeginTransactionAsync())
+        {
+            var task = await _unitOfWork.Tasks.GetByIdAsync(id);
+            if (task == null) throw new NotFoundException("Task doesn't exist");
+
+            if (task.Status != status)
+            {
+                var newColumn = await _unitOfWork.Columns
+                    .FindAsync(column => column.BoardId == task.BoardId &&
+                                         column.Status == status);
+                
+                task.ColumnId = newColumn?.Id;
+                
+                var currentMaxOrder = await _unitOfWork.Tasks
+                    .GetMaxOrderInColumnAsync(task.ColumnId ?? Guid.Empty);
+                
+                task.Order = currentMaxOrder + 1;
+            }
+            
+            await _unitOfWork.CommitAsync();
+            await transaction.CommitAsync();
+        }
     }
 
     public async Task DeleteTaskAsync(Guid id)
