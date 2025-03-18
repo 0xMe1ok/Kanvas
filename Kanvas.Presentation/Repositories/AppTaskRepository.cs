@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Presentation.Entities;
+using Presentation.Enums;
 using Presentation.Interfaces;
 
 namespace Presentation.Repositories;
@@ -40,11 +41,21 @@ public class AppTaskRepository : Repository<AppTask>, IAppTaskRepository
     {
         await _context.AppTasks
             .Where(t => t.ColumnId == columnId)
-            .Where(t => t.Order >= startOrder)
-            .Where(t => t.Order <= endOrder)
+            .Where(t => t.Order >= startOrder && t.Order <= endOrder)
             .ExecuteUpdateAsync(setters => 
                 setters.SetProperty(
                     t => t.Order,
                     t => t.Order + shiftBy));
+    }
+
+    public async Task SetColumnForTaskInBoardAsync(Guid boardId, Status status, Guid newColumnId)
+    {
+        await _context.AppTasks
+            .Where(t => t.BoardId == boardId)
+            .Where(t => t.Status == status)
+            .ExecuteUpdateAsync(setters => 
+                setters.SetProperty(
+                    t => t.ColumnId,
+                    newColumnId));
     }
 }

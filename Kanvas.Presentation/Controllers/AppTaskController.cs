@@ -18,6 +18,7 @@ namespace Presentation.Controllers;
 public class AppTaskController : ControllerBase
 {
     // TODO: in global - change dbcontext -> CQRS
+    // TODO: maybe use Result approach, not Exception
     private readonly IAppTaskService _appTaskService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -50,7 +51,6 @@ public class AppTaskController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAppTaskDto appTaskDto)
     {
-        // TODO: only to selected and accessible team
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var task = await _appTaskService.CreateNewTask(appTaskDto);
         return CreatedAtAction(nameof(GetById), new { id = task.Id }, _mapper.Map<AppTaskDto>(task));
@@ -60,7 +60,6 @@ public class AppTaskController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTaskDto appTaskDto)
     {
-        // TODO: only to selected and accessible team
         if (!ModelState.IsValid) return BadRequest(ModelState);
         await _appTaskService.UpdateTaskAsync(id, appTaskDto);
         return Ok(appTaskDto);
@@ -71,9 +70,7 @@ public class AppTaskController : ControllerBase
     public async Task<IActionResult> Move([FromRoute] Guid id, [FromBody] MoveAppTaskDto appTaskDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
         await _appTaskService.MoveTaskAsync(id, appTaskDto.NewOrder);
-        
         return Ok(appTaskDto);
     }
 
@@ -82,9 +79,7 @@ public class AppTaskController : ControllerBase
     public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] ChangeStatusAppTaskDto appTaskDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
         await _appTaskService.ChangeTaskStatusAsync(id, appTaskDto.NewStatus);
-        
         return Ok(appTaskDto);
     }
     
