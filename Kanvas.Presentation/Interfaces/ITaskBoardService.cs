@@ -16,14 +16,4 @@ public interface ITaskBoardService
     
     Task<bool> IsBoardExistsAsync(Guid id);
     Task<bool> IsBoardAccessibleAsync(Guid id);
-    
-    // Columns
-    
-    Task<BoardColumn?> CreateNewColumn(CreateBoardColumnDto boardDto);
-    Task<BoardColumn?> GetColumnAsync(Guid id);
-    
-    Task<IEnumerable<BoardColumn>> GetColumnsAsync();
-    
-    Task UpdateColumnAsync(Guid id, UpdateBoardColumnDto boardDto);
-    Task DeleteColumnAsync(Guid id);
 }
