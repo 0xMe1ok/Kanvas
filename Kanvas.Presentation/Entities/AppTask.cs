@@ -17,12 +17,16 @@ public class AppTask : EntityBase<Guid>
     
     public Guid? BoardId { get; set; }
     public Guid? ColumnId { get; set; }
+    
+    public Guid TeamId { get; set; }
     public Status Status { get; set; } = Status.ToDo;
     public Guid CreatedBy { get; set; }
     public Guid? AssigneeId { get; set; }
     
     public TaskBoard? Board { get; set; }
     public BoardColumn? Column { get; set; }
+    
+    public AppTeam? Team { get; set; }
 
     public void SetAssignedTo(Guid? assignedTo)
     {
