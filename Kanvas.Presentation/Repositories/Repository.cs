@@ -43,6 +43,12 @@ public abstract class Repository<TEntity> where TEntity : EntityBase<Guid>
     {
         return await _context.Set<TEntity>().AnyAsync(e => e.Id == id);
     }
+    
+    public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return await _context.Set<TEntity>().Where(predicate).AnyAsync();
+    }
+
 
     public virtual async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> predicate)
     {
