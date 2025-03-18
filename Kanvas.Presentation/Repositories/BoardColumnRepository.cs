@@ -21,4 +21,26 @@ public class BoardColumnRepository : Repository<BoardColumn>, IBoardColumnReposi
     {
         await _context.Set<BoardColumn>().AddRangeAsync(boardColumns);
     }
+    
+    public async Task<int> GetMaxOrderInBoardAsync(Guid boardId)
+    {
+        return await _context.BoardColumns
+            .Where(c => c.BoardId == boardId)
+            .MaxAsync(c => (int?)c.Order) ?? 0;
+    }
+    
+    public async Task ShiftColumnsOrderAsync(
+        Guid boardId,
+        int startOrder,
+        int endOrder,
+        int shiftBy)
+    {
+        await _context.BoardColumns
+            .Where(c => c.BoardId == boardId)
+            .Where(c => c.Order >= startOrder && c.Order <= endOrder)
+            .ExecuteUpdateAsync(setters => 
+                setters.SetProperty(
+                    c => c.Order,
+                    c => c.Order + shiftBy));
+    }
 }
