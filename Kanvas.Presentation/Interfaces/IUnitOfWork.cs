@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Storage;
+
 namespace Presentation.Interfaces;
 
 public interface IUnitOfWork : IDisposable
@@ -8,4 +10,6 @@ public interface IUnitOfWork : IDisposable
     ITaskBoardRepository Boards { get; }
     Task<int> CommitAsync();
     Task RollbackAsync();
+    
+    Task<IDbContextTransaction> BeginTransactionAsync();
 }
