@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Presentation.Entities;
+using Presentation.Identity;
 
 namespace Presentation.Configuration;
 
@@ -11,7 +12,6 @@ public class AppTaskConfiguration : IEntityTypeConfiguration<AppTask>
         builder.ToTable("Tasks");
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id).ValueGeneratedOnAdd();
-        builder.Property(t => t.CreatedBy).HasDefaultValue(Guid.NewGuid()); // user here
         builder
             .HasOne(t => t.Board)
             .WithMany(b => b.Tasks)
@@ -26,5 +26,15 @@ public class AppTaskConfiguration : IEntityTypeConfiguration<AppTask>
         builder
             .Property(t => t.Status)
             .HasConversion<string>();
+        
+        /*
+        builder
+            .HasOne<AppUser>()
+            .WithMany()
+            .HasForeignKey(task => task.CreatedBy)
+            .HasPrincipalKey(user => user.Id)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
+            */
     }
 }
