@@ -1,10 +1,11 @@
-using Presentation.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Presentation.Configuration;
+using Presentation.Entities;
+using Presentation.Identity;
 
-namespace Presentation;
+namespace Presentation.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid>
 {
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {

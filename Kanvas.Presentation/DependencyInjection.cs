@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using Asp.Versioning;
-using Presentation;
 using Presentation.Mapper;
 using Microsoft.EntityFrameworkCore;
-using Presentation.Exceptions;
+using Presentation.Data;
+using Presentation.Identity;
 using Presentation.Interfaces;
 using Presentation.Repositories;
 using Presentation.Services;
@@ -12,7 +12,7 @@ namespace Presentation;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddAppDI(this IServiceCollection services)
+    public static IServiceCollection AddAppDi(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers()
             .AddJsonOptions(options =>
@@ -33,7 +33,7 @@ public static class DependencyInjection
         });
         
         services.AddDbContext<ApplicationDbContext>(options => {
-                options.UseNpgsql("Server=127.0.0.1;Port=5432;Database=kanvasdb;Username=pguser;Password=secretpassword;");
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             }
         );
         
@@ -52,6 +52,11 @@ public static class DependencyInjection
         services.AddScoped<ITaskBoardRepository, TaskBoardRepository>();
 
         services.AddScoped<IAppTaskService, AppTaskService>();
+        services.AddScoped<IAppTeamService, AppTeamService>();
+        services.AddScoped<IBoardColumnService, BoardColumnService>();
+        services.AddScoped<ITaskBoardService, TaskBoardService>();
+        
+        services.AddScoped<ITokenService, TokenService>();
 
         services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
         
