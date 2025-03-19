@@ -19,11 +19,16 @@ namespace Presentation.Controllers;
 [ApiVersion("1.0")]
 public class AppTeamController : ControllerBase
 {
+    private readonly IAppTeamService _appTeamService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public AppTeamController(IUnitOfWork unitOfWork, IMapper mapper)
+    public AppTeamController(
+        IAppTeamService appTeamService,
+        IUnitOfWork unitOfWork, 
+        IMapper mapper)
     {
+        _appTeamService = appTeamService;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
@@ -33,8 +38,7 @@ public class AppTeamController : ControllerBase
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         // TODO: get all from accessible teams
-        var team = await _unitOfWork.Teams.GetByIdAsync(id);
-        if (team == null) return NotFound();
+        var team = await _appTeamService.GetTeamAsync(id);
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
 
@@ -42,20 +46,16 @@ public class AppTeamController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         // TODO: only for accessible teams
-        var teams = await _unitOfWork.Teams.GetAllAsync();
+        var teams = await _appTeamService.GetTeamsAsync();
         return Ok(teams.Select(team => _mapper.Map<AppTeamDto>(team)));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateAppTeamDto appAppTeamDto)
+    public async Task<IActionResult> Create([FromBody] CreateAppTeamDto teamDto)
     {
         // TODO: use userId to ownerId
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
-        var team = _mapper.Map<AppTeam>(appAppTeamDto);
-        await _unitOfWork.Teams.AddAsync(team);
-        await _unitOfWork.CommitAsync();
-        
+        var team = await _appTeamService.CreateNewTeam(teamDto);
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
 
@@ -66,10 +66,7 @@ public class AppTeamController : ControllerBase
         // TODO: only for owner
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
-        var team = await _unitOfWork.Teams.GetByIdAsync(id);
-        if (team == null) return NotFound();
-        _mapper.Map(appAppTeamDto, team);
-        await _unitOfWork.CommitAsync();
+        var team = await _appTeamService.GetTeamAsync(id);
         
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
@@ -79,11 +76,7 @@ public class AppTeamController : ControllerBase
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         // TODO: only for owner
-        var team = await _unitOfWork.Teams.GetByIdAsync(id);
-        if (team == null) return NotFound();
-        _unitOfWork.Teams.Remove(team);
-        await _unitOfWork.CommitAsync();
-        
+        await _appTeamService.DeleteTeamAsync(id);
         return NoContent();
     }
 

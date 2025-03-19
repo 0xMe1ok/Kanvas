@@ -1,35 +1,56 @@
+using AutoMapper;
 using Presentation.DTOs.Team;
 using Presentation.Entities;
+using Presentation.Exceptions;
 using Presentation.Interfaces;
 
 namespace Presentation.Services;
 
 public class AppTeamService : IAppTeamService
 {
-    // TODO: create logic here
-    public Task<AppTeam?> CreateNewTeam(CreateAppTeamDto teamDto)
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public AppTeamService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        throw new NotImplementedException();
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
+    public async Task<AppTeam?> CreateNewTeam(CreateAppTeamDto teamDto)
+    {
+        var team = _mapper.Map<AppTeam>(teamDto);
+        await _unitOfWork.Teams.AddAsync(team);
+        await _unitOfWork.CommitAsync();
+        
+        return _mapper.Map<AppTeam>(team);
     }
 
-    public Task<AppTeam?> GetTeamAsync(Guid id)
+    public async Task<AppTeam?> GetTeamAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var team = await _unitOfWork.Teams.GetByIdAsync(id);
+        if (team == null) throw new NotFoundException("Team not found");
+        return team;
     }
 
-    public Task<IEnumerable<AppTeam>> GetTeamsAsync()
+    public async Task<IEnumerable<AppTeam>> GetTeamsAsync()
     {
-        throw new NotImplementedException();
+        return await _unitOfWork.Teams.GetAllAsync();
     }
 
-    public Task UpdateTeamAsync(Guid id, UpdateAppTeamDto teamDto)
+    public async Task UpdateTeamAsync(Guid id, UpdateAppTeamDto teamDto)
     {
-        throw new NotImplementedException();
+        var team = await _unitOfWork.Teams.GetByIdAsync(id);
+        if (team == null) throw new NotFoundException("Team not found");
+        _mapper.Map(teamDto, team);
+        await _unitOfWork.CommitAsync();
     }
 
-    public Task DeleteTeamAsync(Guid id)
+    public async Task DeleteTeamAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var team = await _unitOfWork.Teams.GetByIdAsync(id);
+        if (team == null) throw new NotFoundException("Team not found");
+        _unitOfWork.Teams.Remove(team);
+        await _unitOfWork.CommitAsync();
     }
 
     public Task<bool> IsTeamExistsAsync(Guid id)
