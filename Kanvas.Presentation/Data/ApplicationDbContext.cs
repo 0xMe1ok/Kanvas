@@ -5,7 +5,8 @@ using Presentation.Identity;
 
 namespace Presentation.Data;
 
-public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid>
+public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid, AppUserClaim, 
+    AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
 {
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {
@@ -21,6 +22,5 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-        // TODO: change OwnerId, MemberId and other userId's to user FK
     }
 }
