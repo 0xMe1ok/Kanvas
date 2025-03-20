@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped<IAppTeamRepository, AppTeamRepository>();
         services.AddScoped<IBoardColumnRepository, BoardColumnRepository>();
         services.AddScoped<ITaskBoardRepository, TaskBoardRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         services.AddScoped<IAppTaskService, AppTaskService>();
         services.AddScoped<IAppTeamService, AppTeamService>();

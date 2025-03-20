@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.DTOs.Account;
 using Presentation.Identity;
+using Presentation.Identity.Tokens;
 using Presentation.Interfaces;
 
 namespace Presentation.Controllers;
@@ -16,12 +17,18 @@ public class AccountController : ControllerBase
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService;
     private readonly SignInManager<AppUser> _signInManager;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-    public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
+    public AccountController(
+        UserManager<AppUser> userManager, 
+        ITokenService tokenService, 
+        SignInManager<AppUser> signInManager,
+        IRefreshTokenRepository refreshTokenRepository)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _signInManager = signInManager;
+        _refreshTokenRepository = refreshTokenRepository;
     }
 
     [HttpPost("register")]
@@ -48,13 +55,24 @@ public class AccountController : ControllerBase
             {
                 return StatusCode(500, roleResult.Errors);
             }
-                
+
+            var refreshToken = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = appUser.Id,
+                Token = _tokenService.CreateRefreshToken(),
+                Expires = DateTime.UtcNow.AddDays(7),
+            };
+            
+            await _refreshTokenRepository.AddAsync(refreshToken);
+            
             return Ok(
-                new NewUserDto
+                new LoginUserDto
                 {
                     Username = registerDto.Username,
                     Email = registerDto.Email,
-                    Token = _tokenService.CreateToken(appUser)
+                    Token = _tokenService.CreateToken(appUser),
+                    RefreshToken = refreshToken.Token
                 });
         }
         catch (Exception e)
@@ -73,12 +91,22 @@ public class AccountController : ControllerBase
         if (!await _userManager.CheckPasswordAsync(user, loginDto.Password)) return Unauthorized();
         var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
         if (!result.Succeeded) return Unauthorized("Username or password is incorrect");
+        var refreshToken = new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = _tokenService.CreateRefreshToken(),
+            Expires = DateTime.UtcNow.AddDays(7),
+        };
+            
+        await _refreshTokenRepository.AddAsync(refreshToken);
         return Ok(
-            new NewUserDto
+            new LoginUserDto
             {
                 Username = user.UserName,
                 Email = user.Email,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                RefreshToken = refreshToken.Token
             });
     }
 
