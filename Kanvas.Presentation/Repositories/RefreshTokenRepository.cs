@@ -26,6 +26,13 @@ public class RefreshTokenRepository : IRefreshTokenRepository
             .Include(r => r.UserId)
             .FirstOrDefaultAsync(r => r.Token == refreshToken);
     }
+
+    public async Task RemoveAsync(Guid userId)
+    {
+        await _context.RefreshTokens
+            .Where(r => r.UserId == userId)
+            .ExecuteDeleteAsync();
+    }
     
     // TODO: move to UoW
     public async Task CommitAsync()

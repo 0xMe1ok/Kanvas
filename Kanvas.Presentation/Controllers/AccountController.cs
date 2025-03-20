@@ -1,8 +1,10 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.DTOs.Account;
+using Presentation.Extensions;
 using Presentation.Identity;
 using Presentation.Identity.Tokens;
 using Presentation.Interfaces;
@@ -133,6 +135,19 @@ public class AccountController : ControllerBase
         
         return Ok(tokens);
     }
+    
+    [Authorize]
+    [HttpPost("revoke-token")]
+    public async Task<IActionResult> RevokeToken()
+    {
+        var username = User.GetUsername();
+        var appUser = await _userManager.FindByNameAsync(username);
+        if (appUser == null) return Unauthorized();
+        
+        await _refreshTokenRepository.RemoveAsync(appUser.Id);
+        return NoContent();
+    }
+    
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
