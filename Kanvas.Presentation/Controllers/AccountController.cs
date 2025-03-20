@@ -110,6 +110,30 @@ public class AccountController : ControllerBase
             });
     }
 
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var refreshToken = await _refreshTokenRepository.GetAsync(refreshTokenDto.Token);
+        
+        if (refreshToken == null) throw new FormatException("Refresh token is invalid");
+        
+        var accessToken = _tokenService.CreateToken(refreshToken.AppUser);
+
+        refreshToken.Token = _tokenService.CreateRefreshToken();
+        refreshToken.Expires = DateTime.UtcNow.AddDays(7);
+        await _refreshTokenRepository.CommitAsync();
+
+        var tokens = new TokensDto()
+        {
+            Token = accessToken,
+            RefreshToken = refreshToken.Token
+        };
+        
+        return Ok(tokens);
+    }
+
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
