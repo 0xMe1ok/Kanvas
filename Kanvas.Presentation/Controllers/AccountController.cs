@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,8 @@ using Presentation.Interfaces;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/account")]
+[Route("api/v{version:apiVersion}/auth")]
+[ApiVersion("1.0")]
 public class AccountController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
