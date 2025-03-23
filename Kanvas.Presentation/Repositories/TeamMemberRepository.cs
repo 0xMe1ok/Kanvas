@@ -40,4 +40,24 @@ public class TeamMemberRepository : ITeamMemberRepository
     {
         _context.TeamMembers.Update(teamMember);
     }
+
+    public async Task<TeamMember?> GetByIdAsync(Guid teamId, Guid userId)
+    {
+        return await _context.TeamMembers
+            .FirstOrDefaultAsync(t => t.TeamId == teamId && t.MemberId == userId);
+    }
+    
+    public async Task<bool> ExistsAsync(Guid teamId, Guid userId)
+    {
+        return await _context.TeamMembers
+            .AnyAsync(t => t.TeamId == teamId && t.MemberId == userId);
+    }
+
+    public async Task<IEnumerable<Guid>> GetTeamsIdAsync(Guid memberId)
+    {
+        return await _context.TeamMembers
+            .Where(tm => tm.MemberId == memberId)
+            .Select(tm => tm.TeamId)
+            .ToListAsync();
+    }
 }

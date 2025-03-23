@@ -39,7 +39,6 @@ public class AppTeamController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        // TODO: get all from accessible teams
         var team = await _appTeamService.GetTeamAsync(id);
         return Ok(_mapper.Map<AppTeamDto>(team));
     }
@@ -47,7 +46,6 @@ public class AppTeamController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        // TODO: only for accessible teams
         var teams = await _appTeamService.GetTeamsAsync();
         return Ok(teams.Select(team => _mapper.Map<AppTeamDto>(team)));
     }
@@ -55,7 +53,6 @@ public class AppTeamController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAppTeamDto teamDto)
     {
-        // TODO: use userId to ownerId
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var team = await _appTeamService.CreateNewTeam(teamDto);
         return Ok(_mapper.Map<AppTeamDto>(team));
@@ -65,7 +62,6 @@ public class AppTeamController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTeamDto teamDto)
     {
-        // TODO: only for owner
         if (!ModelState.IsValid) return BadRequest(ModelState);
         await _appTeamService.UpdateTeamAsync(id, teamDto);
         return Ok(_mapper.Map<AppTeamDto>(teamDto));
@@ -75,7 +71,6 @@ public class AppTeamController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        // TODO: only for owner
         await _appTeamService.DeleteTeamAsync(id);
         return NoContent();
     }

@@ -12,4 +12,6 @@ public class AppTeamRepository : Repository<AppTeam>, IAppTeamRepository
         : base(context)
     {
     }
+    
+    
 }

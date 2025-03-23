@@ -1,17 +1,16 @@
 using System.Security.Claims;
+using Presentation.Exceptions;
+using Presentation.Extensions;
 using Presentation.Interfaces;
 
 namespace Presentation.Data;
 
-public class UserContext : IUserContext
+public sealed class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public UserContext(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    public string UserId => _httpContextAccessor.HttpContext?.User?
-        .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    public Guid UserId =>
+        httpContextAccessor
+            .HttpContext?
+            .User
+            .GetId() ??
+        throw new NotFoundException("User does not exist.");
 }

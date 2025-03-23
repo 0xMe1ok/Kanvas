@@ -12,6 +12,4 @@ public interface IAppTeamService
     
     Task UpdateTeamAsync(Guid id, UpdateAppTeamDto teamDto);
     Task DeleteTeamAsync(Guid id);
-    
-    Task<bool> IsTeamExistsAsync(Guid id);
 }

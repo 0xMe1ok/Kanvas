@@ -64,6 +64,9 @@ public static class DependencyInjection
         
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<ITeamRoleService, TeamRoleService>();
+
+        services.AddScoped<IUserContext, UserContext>();
 
         services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
         
