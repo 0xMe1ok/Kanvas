@@ -15,14 +15,14 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/auth")]
 [ApiVersion("1.0")]
-public class AccountController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService;
     private readonly SignInManager<AppUser> _signInManager;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-    public AccountController(
+    public AuthController(
         UserManager<AppUser> userManager, 
         ITokenService tokenService, 
         SignInManager<AppUser> signInManager,
