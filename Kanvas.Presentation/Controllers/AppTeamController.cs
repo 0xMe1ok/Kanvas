@@ -79,23 +79,4 @@ public class AppTeamController : ControllerBase
         await _appTeamService.DeleteTeamAsync(id);
         return NoContent();
     }
-    
-    // TODO: do when user was added
-    [HttpPost]
-    [Route("{teamId}/users")] // [Route("{teamId}/users")]
-    public async Task<IActionResult> AddUserToTeam([FromRoute] Guid teamId, [FromRoute] Guid userId) // FromBody] user UsedId
-    {
-        // TODO: only for owner
-        return Ok();
-    }
-    
-    // TODO: do when user was added
-    [HttpDelete]
-    [Route("{teamId}/users/{userId}")]
-    public async Task<IActionResult> RemoveUserFromTeam([FromRoute] Guid teamId, [FromRoute] Guid userId)
-    {
-        // TODO: only for owner
-        return Ok();
-    }
-    
 }
