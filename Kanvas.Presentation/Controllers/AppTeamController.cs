@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Presentation;
 using Presentation.DTOs;
 using Presentation.Mapper;
@@ -17,6 +18,7 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/teams")]
 [ApiVersion("1.0")]
+[Authorize]
 public class AppTeamController : ControllerBase
 {
     private readonly IAppTeamService _appTeamService;
@@ -76,67 +78,6 @@ public class AppTeamController : ControllerBase
         // TODO: only for owner
         await _appTeamService.DeleteTeamAsync(id);
         return NoContent();
-    }
-
-    [HttpGet]
-    [Route("{id:guid}/boards")]
-    public async Task<IActionResult> GetBoards([FromRoute] Guid id)
-    {
-        var boards = await _unitOfWork.Boards.FindAllAsync(board => board.TeamId == id);
-        return Ok(_mapper.Map<IEnumerable<TaskBoardDto>>(boards));
-    }
-    
-    [HttpPost]
-    [Route("{id:guid}/boards")]
-    public async Task<IActionResult> CreateBoard([FromRoute] Guid id, [FromBody] CreateTaskBoardInTeamDto boardDto)
-    {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-
-        if (await _unitOfWork.Teams.ExistsAsync(id))
-        {
-            return NotFound("Team doesn't exist");
-        }
-        
-        var board = _mapper.Map<TaskBoard>(boardDto);
-        board.TeamId = id;
-        await _unitOfWork.Boards.AddAsync(board);
-        
-        // TODO: move to service
-        var columnsStarterPack = new List<BoardColumn>
-        {
-            new BoardColumn
-            {
-                Id = Guid.NewGuid(),
-                BoardId = board.Id,
-                Name = "ToDo",
-                Order = 0,
-                Status = Status.ToDo,
-                TaskLimit = null
-            },
-            new BoardColumn
-            {
-                Id = Guid.NewGuid(),
-                BoardId = board.Id,
-                Name = "InProgress",
-                Order = 1,
-                Status = Status.InProgress,
-                TaskLimit = null
-            },
-            new BoardColumn
-            {
-                Id = Guid.NewGuid(),
-                BoardId = board.Id,
-                Name = "Done",
-                Order = 2,
-                Status = Status.Done,
-                TaskLimit = null
-            },
-        };
-
-        await _unitOfWork.Columns.AddRangeAsync(columnsStarterPack);
-        await _unitOfWork.CommitAsync();
-        
-        return CreatedAtAction(nameof(GetById), new {id = board.Id}, _mapper.Map<TaskBoardDto>(board));
     }
     
     // TODO: do when user was added

@@ -17,6 +17,4 @@ public interface IAppTaskService
     Task ChangeTaskStatusAsync(Guid id, Status newStatus);
     
     Task MoveTaskAsync(Guid id, int newOrder);
-    
-    //Task UpdateTaskStatusAsync(Guid id, UpdateAppTaskStatusDto taskDto);
 }

@@ -17,12 +17,12 @@ public class TaskBoardService : ITaskBoardService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-    public async Task<TaskBoard> CreateNewBoard(CreateTaskBoardDto boardDto)
+    public async Task<TaskBoard> CreateNewBoard(Guid teamId, CreateTaskBoardDto boardDto)
     {
         // TODO: only from selected and accessible team
-        if (!await _unitOfWork.Teams.ExistsAsync(boardDto.TeamId))
+        if (!await _unitOfWork.Teams.ExistsAsync(teamId))
         {
-            throw new NotFoundException($"Team with id {boardDto.TeamId} does not exist.");
+            throw new NotFoundException($"Team with id {teamId} does not exist.");
         }
         
         var board = _mapper.Map<TaskBoard>(boardDto);
@@ -50,11 +50,11 @@ public class TaskBoardService : ITaskBoardService
         return board;
     }
 
-    public async Task<TaskBoard?> GetBoardAsync(Guid boardId)
+    public async Task<TaskBoard?> GetBoardAsync(Guid teamId, Guid boardId)
     {
         // TODO: only from selected and accessible team, for admins/redactors
         var board = await _unitOfWork.Boards.GetByIdAsync(boardId);
-        if (board == null) throw new NotFoundException("Board is not found");
+        if (board == null || board.TeamId != teamId) throw new NotFoundException("Board is not found");
         return board;
     }
 
@@ -70,15 +70,15 @@ public class TaskBoardService : ITaskBoardService
         return await _unitOfWork.Boards.FindAllAsync(t => t.TeamId == teamId);
     }
 
-    public async Task UpdateBoardAsync(Guid id, UpdateTaskBoardDto boardDto)
+    public async Task UpdateBoardAsync(Guid teamId, Guid id, UpdateTaskBoardDto boardDto)
     {
         var board = await _unitOfWork.Boards.GetByIdAsync(id);
-        if (board == null) throw new NotFoundException("Board is not found");
+        if (board == null || board.TeamId != teamId) throw new NotFoundException("Board is not found");
         _mapper.Map(boardDto, board);
         await _unitOfWork.CommitAsync();
     }
 
-    public async Task DeleteBoardAsync(Guid id)
+    public async Task DeleteBoardAsync(Guid teamId, Guid id)
     {
         var board = await _unitOfWork.Boards.GetByIdAsync(id);
         if (board == null) throw new NotFoundException("Board is not found");
