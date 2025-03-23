@@ -21,6 +21,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid, Ap
     public DbSet<AppTask> AppTasks { get; set; }
     
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<InviteToken> InviteTokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
