@@ -18,5 +18,9 @@ public class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMember>
         builder.HasOne<AppTeam>()
             .WithMany(team => team.Members)
             .HasForeignKey(tm => tm.TeamId);
+        
+        builder
+            .Property(t => t.Role)
+            .HasConversion<string>();
     }
 }

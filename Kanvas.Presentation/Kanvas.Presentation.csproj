@@ -34,7 +34,6 @@
 
     <ItemGroup>
       <Folder Include="CQRS\" />
-      <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>
