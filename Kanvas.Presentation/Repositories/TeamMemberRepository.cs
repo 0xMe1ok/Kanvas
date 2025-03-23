@@ -14,22 +14,29 @@ public class TeamMemberRepository : ITeamMemberRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<TeamMember>> GetAllInTeamAsync(Guid teamId)
+    public async Task<IEnumerable<TeamMember>> GetAll(Guid teamId)
     {
         return await _context.TeamMembers.Where(tm => tm.TeamId == teamId).ToListAsync();
     }
     
-    public async Task AddTeamMemberAsync(TeamMember teamMember)
+    public async Task AddAsync(TeamMember teamMember)
     {
         await _context.TeamMembers.AddAsync(teamMember);
     }
 
-    public void RemoveTeamMemberAsync(TeamMember teamMember)
+    public void Remove(TeamMember teamMember)
     {
         _context.TeamMembers.Remove(teamMember);
     }
+    
+    public async Task RemoveAsync(Guid teamId, Guid userId)
+    {
+        await _context.TeamMembers
+            .Where(t => t.TeamId == teamId && t.MemberId == userId)
+            .ExecuteDeleteAsync();
+    }
 
-    public void UpdateTeamMemberAsync(TeamMember teamMember)
+    public void Update(TeamMember teamMember)
     {
         _context.TeamMembers.Update(teamMember);
     }
