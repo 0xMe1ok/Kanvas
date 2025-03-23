@@ -83,7 +83,7 @@ public class InvitationController : ControllerBase
             Role = TeamRole.Viewer
         };
 
-        await _unitOfWork.TeamMembers.AddTeamMemberAsync(teamMember);
+        await _unitOfWork.TeamMembers.AddAsync(teamMember);
         
         return Ok(teamMember);
     }
