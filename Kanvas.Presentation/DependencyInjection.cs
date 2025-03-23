@@ -61,6 +61,9 @@ public static class DependencyInjection
         services.AddScoped<ITeamMemberRepository, TeamMemberRepository>();
         
         services.AddScoped<ITokenService, TokenService>();
+        
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserContext, UserContext>();
 
         services.AddAutoMapper(typeof(AutomapperConfig).Assembly);
         
