@@ -14,19 +14,22 @@ public class UnitOfWork : IUnitOfWork
         IAppTeamRepository appTeamRepository,
         ITaskBoardRepository taskBoardRepository,
         IBoardColumnRepository boardColumnRepository,
-        IAppTaskRepository appTaskRepository)
+        IAppTaskRepository appTaskRepository,
+        ITeamMemberRepository teamMemberRepository)
     {
         _context = context;
         Boards = taskBoardRepository;
         Tasks = appTaskRepository;
         Columns = boardColumnRepository;
         Teams = appTeamRepository;
+        TeamMembers = teamMemberRepository;
     }
     
     public IAppTeamRepository Teams { get; }
     public IAppTaskRepository Tasks { get; }
     public IBoardColumnRepository Columns { get; }
     public ITaskBoardRepository Boards { get; }
+    public ITeamMemberRepository TeamMembers { get; }
 
     public async Task<int> CommitAsync()
     {

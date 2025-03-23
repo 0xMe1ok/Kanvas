@@ -9,6 +9,8 @@ public interface IUnitOfWork : IDisposable
     IAppTaskRepository Tasks { get; }
     IBoardColumnRepository Columns { get; }
     ITaskBoardRepository Boards { get; }
+    
+    ITeamMemberRepository TeamMembers { get; }
     Task<int> CommitAsync();
     Task RollbackAsync();
     
