@@ -6,4 +6,5 @@ public interface ITokenService
 {
     string CreateToken(AppUser user);
     string CreateRefreshToken();
+    string CreateInvitationToken();
 }
