@@ -63,6 +63,12 @@ public class TaskBoardService : ITaskBoardService
         // TODO: only from selected and accessible team, for admins/redactors
         return await _unitOfWork.Boards.GetAllAsync();
     }
+    
+    public async Task<IEnumerable<TaskBoard>> GetBoardsAsync(Guid teamId)
+    {
+        // TODO: only from selected and accessible team, for admins/redactors
+        return await _unitOfWork.Boards.FindAllAsync(t => t.TeamId == teamId);
+    }
 
     public async Task UpdateBoardAsync(Guid id, UpdateTaskBoardDto boardDto)
     {

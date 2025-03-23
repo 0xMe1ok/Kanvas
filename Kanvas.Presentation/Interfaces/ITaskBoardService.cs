@@ -10,7 +10,7 @@ public interface ITaskBoardService
     Task<TaskBoard?> GetBoardAsync(Guid boardId);
     
     Task<IEnumerable<TaskBoard>> GetBoardsAsync();
-    
+    Task<IEnumerable<TaskBoard>> GetBoardsAsync(Guid teamId);
     Task UpdateBoardAsync(Guid id, UpdateTaskBoardDto boardDto);
     Task DeleteBoardAsync(Guid id);
 }
