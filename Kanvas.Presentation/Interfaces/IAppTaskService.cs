@@ -6,15 +6,15 @@ namespace Presentation.Interfaces;
 
 public interface IAppTaskService
 {
-    Task<AppTask?> CreateNewTask(CreateAppTaskDto taskDto);
-    Task<AppTask?> GetTaskAsync(Guid id);
+    Task<AppTask?> CreateNewTask(Guid teamId, CreateAppTaskDto taskDto);
+    Task<AppTask?> GetTaskAsync(Guid teamId, Guid id);
     
-    Task<IEnumerable<AppTask>> GetTasksAsync();
+    Task<IEnumerable<AppTask>> GetTasksAsync(Guid teamId);
     
-    Task UpdateTaskAsync(Guid id, UpdateAppTaskDto taskDto);
-    Task DeleteTaskAsync(Guid id);
+    Task UpdateTaskAsync(Guid teamId, Guid id, UpdateAppTaskDto taskDto);
+    Task DeleteTaskAsync(Guid teamId, Guid id);
     
-    Task ChangeTaskStatusAsync(Guid id, Status newStatus);
+    Task ChangeTaskStatusAsync(Guid teamId, Guid id, Status newStatus);
     
-    Task MoveTaskAsync(Guid id, int newOrder);
+    Task MoveTaskAsync(Guid teamId, Guid id, int newOrder);
 }

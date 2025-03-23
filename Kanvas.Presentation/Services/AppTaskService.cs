@@ -18,7 +18,7 @@ public class AppTaskService : IAppTaskService
         _mapper = mapper;
     }
     
-    public async Task<AppTask?> CreateNewTask(CreateAppTaskDto taskDto)
+    public async Task<AppTask?> CreateNewTask(Guid teamId, CreateAppTaskDto taskDto)
     {
         // TODO: only to selected and accessible team
         if (taskDto.BoardId != null && 
@@ -26,8 +26,14 @@ public class AppTaskService : IAppTaskService
         {
             throw new NotFoundException($"Board by id = {taskDto.BoardId} doesn't exist");
         }
+
+        if (!await _unitOfWork.Teams.ExistsAsync(teamId))
+        {
+            throw new NotFoundException($"Team by id = {teamId} doesn't exist");
+        }
         
         var task = _mapper.Map<AppTask>(taskDto);
+        task.TeamId = teamId;
         var column = await _unitOfWork.Columns
             .FindAsync(column => column.BoardId == taskDto.BoardId 
                                  && column.Status == task.Status);
@@ -44,22 +50,26 @@ public class AppTaskService : IAppTaskService
         return task;
     }
 
-    public async Task<AppTask?> GetTaskAsync(Guid id)
+    public async Task<AppTask?> GetTaskAsync(Guid teamId, Guid id)
     {
         // TODO: only to selected and accessible team
+        if (!await _unitOfWork.Teams.ExistsAsync(teamId))
+        {
+            throw new NotFoundException($"Team by id = {teamId} doesn't exist");
+        }
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-        if (task == null) throw new NotFoundException("Task doesn't exist");
+        if (task == null || task.TeamId != teamId) throw new NotFoundException("Task doesn't exist");
         return task;
     }
 
-    public async Task<IEnumerable<AppTask>> GetTasksAsync()
+    public async Task<IEnumerable<AppTask>> GetTasksAsync(Guid teamId)
     {
         // TODO: only from selected and accessible team
-        var tasks = await _unitOfWork.Tasks.GetAllAsync();
+        var tasks = await _unitOfWork.Tasks.FindAllAsync(t => t.TeamId == teamId);
         return tasks;
     }
 
-    public async Task UpdateTaskAsync(Guid id, UpdateAppTaskDto taskDto)
+    public async Task UpdateTaskAsync(Guid teamId, Guid id, UpdateAppTaskDto taskDto)
     {
         // TODO: only to selected and accessible team
         // TODO: maybe separate boardId
@@ -69,8 +79,13 @@ public class AppTaskService : IAppTaskService
             throw new NotFoundException($"Board by id = {taskDto.BoardId} doesn't exist");
         }
         
+        if (!await _unitOfWork.Teams.ExistsAsync(teamId))
+        {
+            throw new NotFoundException($"Team by id = {teamId} doesn't exist");
+        }
+        
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-        if (task == null) throw new NotFoundException($"Task by id = {id} doesn't exist");
+        if (task == null || task.TeamId != teamId) throw new NotFoundException("Task doesn't exist");
         
         await using var transaction = await _unitOfWork.BeginTransactionAsync();
 
@@ -89,11 +104,11 @@ public class AppTaskService : IAppTaskService
         await transaction.CommitAsync();
     }
 
-    public async Task MoveTaskAsync(Guid id, int order)
+    public async Task MoveTaskAsync(Guid teamId, Guid id, int order)
     {
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
             
-        if (task == null) throw new NotFoundException("Task doesn't exist");
+        if (task == null || task.TeamId != teamId) throw new NotFoundException("Task doesn't exist");
         if (task.ColumnId == null) throw new ForbiddenException("Task doesn't have column");
         if (task.Order == order) return;
             
@@ -108,11 +123,11 @@ public class AppTaskService : IAppTaskService
         await transaction.CommitAsync();
     }
 
-    public async Task ChangeTaskStatusAsync(Guid id, Status status)
+    public async Task ChangeTaskStatusAsync(Guid teamId, Guid id, Status status)
     {
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
         
-        if (task == null) throw new NotFoundException("Task doesn't exist");
+        if (task == null || task.TeamId != teamId) throw new NotFoundException("Task doesn't exist");
         if (task.Status == status) return;
         
         await using var transaction = await _unitOfWork.BeginTransactionAsync();
@@ -123,10 +138,10 @@ public class AppTaskService : IAppTaskService
         await transaction.CommitAsync();
     }
 
-    public async Task DeleteTaskAsync(Guid id)
+    public async Task DeleteTaskAsync(Guid teamId, Guid id)
     {
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
-        if (task == null) throw new NotFoundException($"Task by id = {id} doesn't exist");
+        if (task == null || task.TeamId != teamId) throw new NotFoundException($"Task by id = {id} doesn't exist");
         _unitOfWork.Tasks.Remove(task);
         await _unitOfWork.CommitAsync();
     }
