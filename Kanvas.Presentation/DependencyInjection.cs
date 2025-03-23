@@ -52,11 +52,13 @@ public static class DependencyInjection
         services.AddScoped<IBoardColumnRepository, BoardColumnRepository>();
         services.AddScoped<ITaskBoardRepository, TaskBoardRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IInviteTokenRepository, InviteTokenRepository>();
 
         services.AddScoped<IAppTaskService, AppTaskService>();
         services.AddScoped<IAppTeamService, AppTeamService>();
         services.AddScoped<IBoardColumnService, BoardColumnService>();
         services.AddScoped<ITaskBoardService, TaskBoardService>();
+        services.AddScoped<ITeamMemberRepository, TeamMemberRepository>();
         
         services.AddScoped<ITokenService, TokenService>();
 
