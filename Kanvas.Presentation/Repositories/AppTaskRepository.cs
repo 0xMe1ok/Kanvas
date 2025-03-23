@@ -3,6 +3,7 @@ using Presentation.Data;
 using Presentation.Entities;
 using Presentation.Enums;
 using Presentation.Interfaces;
+using Presentation.Interfaces.Repository;
 
 namespace Presentation.Repositories;
 

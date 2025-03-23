@@ -1,6 +1,6 @@
 using Presentation.Identity.Tokens;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Interfaces.Repository;
 
 public interface IRefreshTokenRepository
 {

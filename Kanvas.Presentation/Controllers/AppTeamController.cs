@@ -61,14 +61,12 @@ public class AppTeamController : ControllerBase
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTeamDto appAppTeamDto)
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAppTeamDto teamDto)
     {
         // TODO: only for owner
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
-        var team = await _appTeamService.GetTeamAsync(id);
-        
-        return Ok(_mapper.Map<AppTeamDto>(team));
+        await _appTeamService.UpdateTeamAsync(id, teamDto);
+        return Ok(_mapper.Map<AppTeamDto>(teamDto));
     }
 
     [HttpDelete]

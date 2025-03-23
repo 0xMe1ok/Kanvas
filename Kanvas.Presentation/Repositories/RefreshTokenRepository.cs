@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Presentation.Data;
 using Presentation.Identity.Tokens;
 using Presentation.Interfaces;
+using Presentation.Interfaces.Repository;
 
 namespace Presentation.Repositories;
 

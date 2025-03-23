@@ -1,6 +1,6 @@
 using Presentation.Entities;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Interfaces.Repository;
 
 public interface IBoardColumnRepository : IRepository<BoardColumn>
 {
