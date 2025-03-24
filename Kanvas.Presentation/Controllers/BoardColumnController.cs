@@ -8,7 +8,7 @@ using Presentation.Interfaces;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/boards/{boardId:guid}/columns")]
+[Route("api/v{version:apiVersion}/teams/{teamId:guid}/boards/{boardId:guid}/columns")]
 [ApiVersion("1.0")]
 public class BoardColumnController : Controller
 {
@@ -16,7 +16,6 @@ public class BoardColumnController : Controller
     private readonly IMapper _mapper;
 
     public BoardColumnController(
-        IUnitOfWork unitOfWork, 
         IMapper mapper, 
         IBoardColumnService columnService)
     {
@@ -25,49 +24,58 @@ public class BoardColumnController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAll([FromRoute] Guid boardId)
+    public async Task<ActionResult> GetAll([FromRoute] Guid teamId, [FromRoute] Guid boardId)
     {
-        var columns = await _columnService.GetColumnsAsync(boardId);
+        var columns = await _columnService.GetColumnsAsync(teamId, boardId);
         return Ok(_mapper.Map<List<BoardColumnDto>>(columns));
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromRoute] Guid boardId, [FromBody] CreateBoardColumnDto columnDto)
+    public async Task<ActionResult> Create(
+        [FromRoute] Guid teamId,
+        [FromRoute] Guid boardId, 
+        [FromBody] CreateBoardColumnDto columnDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var column = await _columnService.CreateNewColumn(boardId, columnDto);
+        var column = await _columnService.CreateNewColumn(teamId, boardId, columnDto);
         return Ok(_mapper.Map<BoardColumnDto>(column));
     }
 
     [HttpPut]
     [Route("{id:guid}")]
-    public async Task<ActionResult> Update([FromRoute] Guid boardId, 
-        [FromRoute] Guid id, [FromBody] UpdateBoardColumnDto boardColumnDto)
+    public async Task<ActionResult> Update(
+        [FromRoute] Guid teamId, 
+        [FromRoute] Guid boardId, 
+        [FromRoute] Guid id,
+        [FromBody] UpdateBoardColumnDto boardColumnDto)
     {
-        
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        await _columnService.UpdateColumnAsync(boardId, id, boardColumnDto);
+        await _columnService.UpdateColumnAsync(teamId, boardId, id, boardColumnDto);
         return Ok(boardColumnDto);
     }
     
     [HttpPatch]
     [Route("{id:guid}/order")]
     public async Task<IActionResult> Move(
+        [FromRoute] Guid teamId,
         [FromRoute] Guid boardId, 
         [FromRoute] Guid id, 
         [FromBody] MoveBoardColumnDto columnDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        await _columnService.MoveColumnAsync(boardId, id, columnDto.NewOrder);
+        await _columnService.MoveColumnAsync(teamId, boardId, id, columnDto.NewOrder);
         return Ok(columnDto);
     }
 
     [HttpDelete]
     [Route("{id:guid}")]
-    public async Task<ActionResult> Delete([FromRoute] Guid boardId, [FromRoute] Guid id)
+    public async Task<ActionResult> Delete(
+        [FromRoute] Guid teamId, 
+        [FromRoute] Guid boardId, 
+        [FromRoute] Guid id)
     {
         // TODO: only for boards in accessible teams, for admins/redactors
-        await _columnService.DeleteColumnAsync(boardId, id);
+        await _columnService.DeleteColumnAsync(teamId, boardId, id);
         return NoContent();
     }
 }
