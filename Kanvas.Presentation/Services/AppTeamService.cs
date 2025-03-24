@@ -32,7 +32,7 @@ public class AppTeamService : IAppTeamService
         var userId = _userContext.UserId;
         
         var team = _mapper.Map<AppTeam>(teamDto);
-        team.OwnerId = (Guid)userId;
+        team.OwnerId = userId;
         
         await _unitOfWork.Teams.AddAsync(team);
         
@@ -44,7 +44,6 @@ public class AppTeamService : IAppTeamService
         };
         
         await _unitOfWork.TeamMembers.AddAsync(membership);
-        
         await _unitOfWork.CommitAsync();
         
         return _mapper.Map<AppTeam>(team);
@@ -55,9 +54,7 @@ public class AppTeamService : IAppTeamService
         var userId = _userContext.UserId;
 
         if (!await _unitOfWork.TeamMembers.ExistsAsync(id, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         var team = await _unitOfWork.Teams.GetByIdAsync(id);
         if (team == null) throw new NotFoundException("Team not found");
@@ -76,14 +73,10 @@ public class AppTeamService : IAppTeamService
     {
         var userId = _userContext.UserId;
         if (!await _unitOfWork.TeamMembers.ExistsAsync(id, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, id, TeamRole.Admin))
-        {
             throw new ForbiddenException($"User does not have permission to update team {id}");
-        }
         
         var team = await _unitOfWork.Teams.GetByIdAsync(id);
         if (team == null) throw new NotFoundException("Team not found");
@@ -95,14 +88,10 @@ public class AppTeamService : IAppTeamService
     {
         var userId = _userContext.UserId;
         if (!await _unitOfWork.TeamMembers.ExistsAsync(id, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
 
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, id, TeamRole.Owner))
-        {
             throw new ForbiddenException($"User does not have permission to delete team {id}");
-        }
         
         var team = await _unitOfWork.Teams.GetByIdAsync(id);
         if (team == null) throw new NotFoundException("Team not found");
