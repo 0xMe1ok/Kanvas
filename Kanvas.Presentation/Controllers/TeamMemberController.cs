@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Entities;
 using Presentation.Enums;
 using Presentation.Exceptions;
 using Presentation.Interfaces;
@@ -40,6 +41,27 @@ public class TeamMemberController : ControllerBase
         
         var members = await _unitOfWork.TeamMembers.GetAll(teamId);
         return Ok(members);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateTeamMember(TeamMember teamMember)
+    {
+        var userId = _userContext.UserId;
+        
+        if (!await _unitOfWork.TeamMembers.ExistsAsync(teamMember.TeamId, userId))
+            throw new ForbiddenException($"User {userId} does not belong to team");
+        
+        if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, teamMember.TeamId, TeamRole.Admin))
+            throw new ForbiddenException($"User does not have permission to update user in team {teamMember.TeamId}");
+        
+        var member = await _unitOfWork.TeamMembers.GetByIdAsync(teamMember.TeamId, teamMember.MemberId);
+        if (member == null)
+            throw new ForbiddenException($"User {userId} does not belong to team");
+        
+        member.Role = teamMember.Role;
+        _unitOfWork.TeamMembers.Update(member);
+        await _unitOfWork.CommitAsync();
+        return Ok(teamMember);
     }
 
     [HttpDelete]
