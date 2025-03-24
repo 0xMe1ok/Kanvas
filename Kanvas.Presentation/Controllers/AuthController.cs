@@ -17,6 +17,7 @@ namespace Presentation.Controllers;
 [ApiVersion("1.0")]
 public class AuthController : ControllerBase
 {
+    // TODO: Wrap into service
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService;
     private readonly SignInManager<AppUser> _signInManager;
@@ -112,7 +113,8 @@ public class AuthController : ControllerBase
                 RefreshToken = refreshToken.Token
             });
     }
-
+    
+    [Authorize]
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
     {
@@ -149,7 +151,7 @@ public class AuthController : ControllerBase
         return NoContent();
     }
     
-
+    [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
