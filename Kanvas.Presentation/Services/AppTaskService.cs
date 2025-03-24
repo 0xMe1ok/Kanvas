@@ -31,25 +31,17 @@ public class AppTaskService : IAppTaskService
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
 
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, teamId, TeamRole.Editor))
-        {
             throw new ForbiddenException($"User does not have permission to create task in team {teamId}");
-        }
         
         if (taskDto.BoardId != null && 
             !await _unitOfWork.Boards.ExistsAsync(taskDto.BoardId ?? Guid.Empty))
-        {
             throw new NotFoundException($"Board by id = {taskDto.BoardId} doesn't exist");
-        }
 
         if (!await _unitOfWork.Teams.ExistsAsync(teamId))
-        {
             throw new NotFoundException($"Team by id = {teamId} doesn't exist");
-        }
         
         var task = _mapper.Map<AppTask>(taskDto);
         task.TeamId = teamId;
@@ -74,14 +66,11 @@ public class AppTaskService : IAppTaskService
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         if (!await _unitOfWork.Teams.ExistsAsync(teamId))
-        {
             throw new NotFoundException($"Team by id = {teamId} doesn't exist");
-        }
+        
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
         if (task == null || task.TeamId != teamId) throw new NotFoundException("Task doesn't exist");
         return task;
@@ -92,9 +81,7 @@ public class AppTaskService : IAppTaskService
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         var tasks = await _unitOfWork.Tasks.FindAllAsync(t => t.TeamId == teamId);
         return tasks;
@@ -105,25 +92,17 @@ public class AppTaskService : IAppTaskService
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, teamId, TeamRole.Editor))
-        {
             throw new ForbiddenException($"User does not have permission to update task in team {teamId}");
-        }
         
         if (taskDto.BoardId != null && 
-            ! await _unitOfWork.Boards.ExistsAsync(taskDto.BoardId ?? Guid.Empty))
-        {
+            !await _unitOfWork.Boards.ExistsAsync(taskDto.BoardId ?? Guid.Empty))
             throw new NotFoundException($"Board by id = {taskDto.BoardId} doesn't exist");
-        }
         
         if (!await _unitOfWork.Teams.ExistsAsync(teamId))
-        {
             throw new NotFoundException($"Team by id = {teamId} doesn't exist");
-        }
         
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
         if (task == null || task.TeamId != teamId) throw new NotFoundException("Task doesn't exist");
@@ -131,13 +110,9 @@ public class AppTaskService : IAppTaskService
         await using var transaction = await _unitOfWork.BeginTransactionAsync();
 
         if (task.Status != taskDto.Status)
-        {
             await ChangeTaskStatusInternalAsync(task, taskDto.Status);
-        }
         else if (task.Order != taskDto.Order)
-        {
             await MoveTaskInternalAsync(task, taskDto.Order);
-        }
         
         _mapper.Map(taskDto, task);
         _unitOfWork.Tasks.Update(task);
@@ -150,14 +125,10 @@ public class AppTaskService : IAppTaskService
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, teamId, TeamRole.Editor))
-        {
             throw new ForbiddenException($"User does not have permission to update task in team {teamId}");
-        }
         
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
             
@@ -181,14 +152,10 @@ public class AppTaskService : IAppTaskService
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, teamId, TeamRole.Editor))
-        {
             throw new ForbiddenException($"User does not have permission to update task in team {teamId}");
-        }
         
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
         
@@ -208,14 +175,10 @@ public class AppTaskService : IAppTaskService
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
-        {
             throw new ForbiddenException($"User {userId} does not belong to team");
-        }
         
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, teamId, TeamRole.Editor))
-        {
             throw new ForbiddenException($"User does not have permission to update task in team {teamId}");
-        }
         
         var task = await _unitOfWork.Tasks.GetByIdAsync(id);
         if (task == null || task.TeamId != teamId) throw new NotFoundException($"Task by id = {id} doesn't exist");
