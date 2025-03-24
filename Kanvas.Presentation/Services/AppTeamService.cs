@@ -82,7 +82,7 @@ public class AppTeamService : IAppTeamService
         
         if (!await _teamRoleService.IsInTeamRoleOrHigherAsync(userId, id, TeamRole.Admin))
         {
-            throw new ForbiddenException($"User does not have permission to delete team {id}");
+            throw new ForbiddenException($"User does not have permission to update team {id}");
         }
         
         var team = await _unitOfWork.Teams.GetByIdAsync(id);
