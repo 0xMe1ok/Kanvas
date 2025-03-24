@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presentation.DTOs;
@@ -14,6 +15,7 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/teams/{teamId}/boards")]
 [ApiVersion("1.0")]
+[Authorize]
 public class TaskBoardController : ControllerBase
 {
     private readonly ITaskBoardService _taskBoardService;

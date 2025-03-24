@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.DTOs.BoardColumn;
 using Presentation.Entities;
@@ -10,6 +11,7 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/teams/{teamId:guid}/boards/{boardId:guid}/columns")]
 [ApiVersion("1.0")]
+[Authorize]
 public class BoardColumnController : Controller
 {
     private readonly IBoardColumnService _columnService;

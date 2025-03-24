@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Entities;
 using Presentation.Enums;
@@ -11,6 +12,7 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/teams/{teamId}/users")]
 [ApiVersion("1.0")]
+[Authorize]
 public class TeamMemberController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;

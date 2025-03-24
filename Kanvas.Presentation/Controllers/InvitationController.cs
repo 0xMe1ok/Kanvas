@@ -19,6 +19,7 @@ namespace Presentation.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/invitation")]
 [ApiVersion("1.0")]
+[Authorize]
 public class InvitationController : ControllerBase
 {
     private readonly IMapper _mapper;
