@@ -30,7 +30,6 @@ public class AppTeamService : IAppTeamService
     public async Task<AppTeam?> CreateNewTeam(CreateAppTeamDto teamDto)
     {
         var userId = _userContext.UserId;
-        if (userId == null) throw new NotFoundException("User does not exist");
         
         var team = _mapper.Map<AppTeam>(teamDto);
         team.OwnerId = (Guid)userId;
