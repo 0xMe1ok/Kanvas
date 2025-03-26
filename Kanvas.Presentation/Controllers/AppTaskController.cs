@@ -21,16 +21,13 @@ public class AppTaskController : ControllerBase
     // TODO: in global - change dbcontext -> CQRS
     // TODO: maybe use Result approach, not Exception
     private readonly IAppTaskService _appTaskService;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
     public AppTaskController
         (IAppTaskService appTaskService, 
-            IUnitOfWork unitOfWork, 
             IMapper mapper)
     {
         _appTaskService = appTaskService;
-        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
     
