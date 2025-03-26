@@ -62,7 +62,6 @@ public class TaskBoardController : ControllerBase
         [FromRoute] Guid id, 
         [FromBody] UpdateTaskBoardDto boardDto)
     {
-        // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
         await _taskBoardService.UpdateBoardAsync(teamId, id, boardDto);
         return Ok(boardDto);
@@ -72,7 +71,6 @@ public class TaskBoardController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid teamId, [FromRoute] Guid id)
     {
-        // TODO: only from selected and accessible team, for admins/redactors
         if (!ModelState.IsValid) return BadRequest(ModelState);
         await _taskBoardService.DeleteBoardAsync(teamId, id);
         return NoContent();

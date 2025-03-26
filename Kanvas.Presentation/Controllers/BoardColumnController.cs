@@ -76,7 +76,6 @@ public class BoardColumnController : Controller
         [FromRoute] Guid boardId, 
         [FromRoute] Guid id)
     {
-        // TODO: only for boards in accessible teams, for admins/redactors
         await _columnService.DeleteColumnAsync(teamId, boardId, id);
         return NoContent();
     }

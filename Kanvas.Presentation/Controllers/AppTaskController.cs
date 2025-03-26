@@ -96,7 +96,6 @@ public class AppTaskController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid teamId, [FromRoute] Guid id)
     {
-        // TODO: only to selected and accessible team, not for viewers
         await _appTaskService.DeleteTaskAsync(teamId, id);
         return NoContent();
     }

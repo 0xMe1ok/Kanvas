@@ -27,8 +27,6 @@ public class BoardColumnService : IBoardColumnService
     }
     public async Task<BoardColumn?> CreateNewColumn(Guid teamId, Guid boardId, CreateBoardColumnDto columnDto)
     {
-        // TODO: only for boards in accessible teams, for admins/redactors
-        // TODO: check for valid status, there can't be two columns with the same status
         var userId = _userContext.UserId;
         
         if (!await _unitOfWork.TeamMembers.ExistsAsync(teamId, userId))
