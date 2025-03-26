@@ -4,6 +4,7 @@ using Presentation.Entities;
 using Presentation.Enums;
 using Presentation.Exceptions;
 using Presentation.Interfaces;
+using Presentation.Interfaces.Service;
 
 namespace Presentation.Services;
 

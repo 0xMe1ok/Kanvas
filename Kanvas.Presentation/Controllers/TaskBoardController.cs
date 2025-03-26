@@ -9,6 +9,7 @@ using Presentation.DTOs.TaskBoard;
 using Presentation.Entities;
 using Presentation.Enums;
 using Presentation.Interfaces;
+using Presentation.Interfaces.Service;
 
 namespace Presentation.Controllers;
 

@@ -2,7 +2,7 @@ using Presentation.DTOs;
 using Presentation.Entities;
 using Presentation.Enums;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Interfaces.Service;
 
 public interface IAppTaskService
 {

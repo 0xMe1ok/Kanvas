@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Interfaces;
+using Presentation.Interfaces.Service;
 
 namespace Presentation.Identity;
 

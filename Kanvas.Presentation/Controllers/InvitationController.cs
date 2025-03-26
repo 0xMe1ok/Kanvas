@@ -12,6 +12,7 @@ using Presentation.Extensions;
 using Presentation.Identity;
 using Presentation.Interfaces;
 using Presentation.Interfaces.Repository;
+using Presentation.Interfaces.Service;
 using Presentation.Repositories;
 
 namespace Presentation.Controllers;

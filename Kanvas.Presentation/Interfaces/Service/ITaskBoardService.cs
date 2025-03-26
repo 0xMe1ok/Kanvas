@@ -1,8 +1,7 @@
-using Presentation.DTOs.BoardColumn;
 using Presentation.DTOs.TaskBoard;
 using Presentation.Entities;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Interfaces.Service;
 
 public interface ITaskBoardService
 {

@@ -1,6 +1,6 @@
 using Presentation.Enums;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Interfaces.Service;
 
 public interface ITeamRoleService
 {

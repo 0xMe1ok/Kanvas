@@ -1,7 +1,7 @@
 using Presentation.DTOs.Team;
 using Presentation.Entities;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Interfaces.Service;
 
 public interface IAppTeamService
 {

@@ -1,6 +1,6 @@
 using Presentation.Identity;
 
-namespace Presentation.Interfaces;
+namespace Presentation.Interfaces.Service;
 
 public interface ITokenService
 {

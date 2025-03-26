@@ -6,6 +6,7 @@ using Presentation.Enums;
 using Presentation.Exceptions;
 using Presentation.Identity;
 using Presentation.Interfaces;
+using Presentation.Interfaces.Service;
 
 namespace Presentation.Services;
 
