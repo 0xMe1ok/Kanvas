@@ -15,7 +15,7 @@ public class TeamRoleService : ITeamRoleService
 
     public async Task<bool> IsInTeamRoleOrHigherAsync(Guid userId, Guid teamId, TeamRole requiredRole)
     {
-        var membership = await _unitOfWork.TeamMembers.GetByIdAsync(userId, teamId);
+        var membership = await _unitOfWork.TeamMembers.GetByIdAsync(teamId, userId);
 
         if (membership == null)
         {

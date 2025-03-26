@@ -53,7 +53,7 @@ public class AppTaskController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var task = await _appTaskService.CreateNewTask(teamId, appTaskDto);
-        return CreatedAtAction(nameof(GetById), new { id = task.Id }, _mapper.Map<AppTaskDto>(task));
+        return CreatedAtAction(nameof(GetById), new { teamId, id = task.Id }, _mapper.Map<AppTaskDto>(task));
     }
 
     [HttpPut]

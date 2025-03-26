@@ -39,6 +39,7 @@ public class TaskBoardService : ITaskBoardService
             throw new NotFoundException($"Team with id {teamId} does not exist.");
         
         var board = _mapper.Map<TaskBoard>(boardDto);
+        board.TeamId = teamId;
         await _unitOfWork.Boards.AddAsync(board);
 
         var columnsStarterPack = new List<BoardColumn>

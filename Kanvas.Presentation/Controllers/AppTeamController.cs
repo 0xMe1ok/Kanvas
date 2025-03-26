@@ -55,7 +55,7 @@ public class AppTeamController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var team = await _appTeamService.CreateNewTeam(teamDto);
-        return Ok(_mapper.Map<AppTeamDto>(team));
+        return CreatedAtAction(nameof(GetById), new { id = team.Id }, _mapper.Map<AppTeamDto>(team));
     }
 
     [HttpPut]

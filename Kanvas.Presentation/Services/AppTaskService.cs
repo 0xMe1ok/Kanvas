@@ -44,7 +44,10 @@ public class AppTaskService : IAppTaskService
             throw new NotFoundException($"Team by id = {teamId} doesn't exist");
         
         var task = _mapper.Map<AppTask>(taskDto);
+        
         task.TeamId = teamId;
+        task.CreatedBy = userId;
+        
         var column = await _unitOfWork.Columns
             .FindAsync(column => column.BoardId == taskDto.BoardId 
                                  && column.Status == task.Status);

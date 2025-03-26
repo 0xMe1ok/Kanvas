@@ -40,7 +40,7 @@ public class BoardColumnController : Controller
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var column = await _columnService.CreateNewColumn(teamId, boardId, columnDto);
-        return Ok(_mapper.Map<BoardColumnDto>(column));
+        return CreatedAtAction(nameof(GetAll), new { teamId, boardId }, column);
     }
 
     [HttpPut]

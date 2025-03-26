@@ -52,7 +52,7 @@ public class TaskBoardController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var board = await _taskBoardService.CreateNewBoard(teamId, taskBoardDto);
-        return CreatedAtAction(nameof(GetById), new {id = board.Id}, _mapper.Map<TaskBoardDto>(board));
+        return CreatedAtAction(nameof(GetById), new {teamId, id = board.Id}, _mapper.Map<TaskBoardDto>(board));
     }
 
     [HttpPut]
