@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Identity;
 using Presentation.Mapper;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Data;
@@ -8,6 +9,7 @@ using Presentation.Interfaces;
 using Presentation.Interfaces.Repository;
 using Presentation.Interfaces.Service;
 using Presentation.Repositories;
+using Presentation.Seeds;
 using Presentation.Services;
 
 namespace Presentation;
@@ -35,7 +37,15 @@ public static class DependencyInjection
         });
         
         services.AddDbContext<ApplicationDbContext>(options => {
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+                    .UseSeeding((context, _) =>
+                    {
+                        AppUserSeeder.Seed(context);
+                    })
+                    .UseAsyncSeeding(async (context, _, cancellationToken) =>
+                    {
+                        await AppUserSeeder.SeedAsync(context, cancellationToken);
+                    });
             }
         );
         
