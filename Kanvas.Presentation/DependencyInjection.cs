@@ -41,25 +41,15 @@ public static class DependencyInjection
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
                     .UseSeeding((context, _) =>
                     {
-                        var seeders = Assembly.GetExecutingAssembly()
-                            .GetTypes().Where(t => typeof(ISeeder).IsAssignableFrom(t) && 
-                                                   !t.IsAbstract && t.IsClass);
-                        foreach (var seeder in seeders)
-                        {
-                            var seedMethod = seeder.GetMethod("Seed", BindingFlags.Static);
-                            seedMethod?.Invoke(null, [context]);
-                        }
+                        IdentityRoleSeeder.Seed(context);
+                        AppUserSeeder.Seed(context);
+                        AppUserRoleSeeder.Seed(context);
                     })
                     .UseAsyncSeeding(async (context, _, cancellationToken) =>
                     {
-                        var seeders = Assembly.GetExecutingAssembly()
-                            .GetTypes().Where(t => typeof(ISeeder).IsAssignableFrom(t) && 
-                                                   !t.IsAbstract && t.IsClass);
-                        foreach (var seeder in seeders)
-                        {
-                            var seedMethod = seeder.GetMethod("SeedAsync", BindingFlags.Static);
-                            await ((Task)seedMethod?.Invoke(null, [context, cancellationToken])!)!;
-                        }
+                        await IdentityRoleSeeder.SeedAsync(context, cancellationToken);
+                        await AppUserSeeder.SeedAsync(context, cancellationToken);
+                        await AppUserRoleSeeder.SeedAsync(context, cancellationToken);
                     });
             }
         );
