@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Identity;
@@ -40,11 +41,25 @@ public static class DependencyInjection
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
                     .UseSeeding((context, _) =>
                     {
-                        AppUserSeeder.Seed(context);
+                        var seeders = Assembly.GetExecutingAssembly()
+                            .GetTypes().Where(t => typeof(ISeeder).IsAssignableFrom(t) && 
+                                                   !t.IsAbstract && t.IsClass);
+                        foreach (var seeder in seeders)
+                        {
+                            var seedMethod = seeder.GetMethod("Seed", BindingFlags.Static);
+                            seedMethod?.Invoke(null, [context]);
+                        }
                     })
                     .UseAsyncSeeding(async (context, _, cancellationToken) =>
                     {
-                        await AppUserSeeder.SeedAsync(context, cancellationToken);
+                        var seeders = Assembly.GetExecutingAssembly()
+                            .GetTypes().Where(t => typeof(ISeeder).IsAssignableFrom(t) && 
+                                                   !t.IsAbstract && t.IsClass);
+                        foreach (var seeder in seeders)
+                        {
+                            var seedMethod = seeder.GetMethod("SeedAsync", BindingFlags.Static);
+                            await ((Task)seedMethod?.Invoke(null, [context, cancellationToken])!)!;
+                        }
                     });
             }
         );
